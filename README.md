@@ -30,6 +30,7 @@ You will also want to copy+edit these files:
 - core/game.gd
 - core/settings.gd
 - core/dev.gd
+
 You don't have to put them in 'core' directory, but you will need to have these three global variables for autoload. Don't worry too much if you have a conflict, Godot is clever enough to distinguish files with the same names (as you can see in the demo app, there is also a menu called "settings.gd").
 
 You will want to manually create these directories (or equivalent):
@@ -37,6 +38,7 @@ You will want to manually create these directories (or equivalent):
 - menus
 - scenes (or levels?)
 - music
+
 Name them anything you want, and let Chore know your directories in "settings.gd"
 
 ---
@@ -47,16 +49,17 @@ You will need to set in your Project Settings:
 - main scene: launch.tscn (see next section)
 - autoload globals (order is important):
 
-engine/debug.gd / debug
-engine/util.gd / util
-engine/math.gd / math
-your-copy/settings.gd / settings
-your-copy/game.gd / game
-your-copy/dev.gd / dev
-engine/audio.tscn / audio
-engine/root.tscn / root
-engine/menus.gd / menus
-engine/scenes.gd / scenes
+Autoload:
+- engine/debug.gd / debug
+- engine/util.gd / util
+- engine/math.gd / math
+- your-copy/settings.gd / settings
+- your-copy/game.gd / game
+- your-copy/dev.gd / dev
+- engine/audio.tscn / audio
+- engine/root.tscn / root
+- engine/menus.gd / menus
+- engine/scenes.gd / scenes
 
 ---
 MAIN SCENE - launch.tscn
@@ -97,6 +100,7 @@ There is a top-level class "menu.gd" provided as reference for your menus/scenes
 
 Instead, ducking is preferred:
 - on_show(), on_hide(), on_pause(), on_resume(), notify_closing(), pass_data()
+
 Add these optional methods to your scene/menu if you need special code during these moments.
 
 ---
@@ -153,7 +157,7 @@ The debug console currently doesn't support typing, but it can be printed to.
 ---
 GODOT GAMES USING CHORE ENGINE
 ---
-Dirty Land - www.dirtylandgame.com
-Forehead Chip - www.foreheadchip.com
-[ more to be announced ]
+- Dirty Land - www.dirtylandgame.com
+- Forehead Chip - www.foreheadchip.com
+- [ more to be announced ]
 
