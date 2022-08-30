@@ -1,0 +1,104 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://scenes/play.gd" type="Script" id=1]
+[ext_resource path="res://art/hud/black-512x512.png" type="Texture" id=2]
+[ext_resource path="res://engine/shaders/screen-whirl.shader" type="Shader" id=3]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 3 )
+shader_param/rotation = -0.5
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[node name="Boring" type="Control"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="Background" type="TextureRect" parent="."]
+visible = false
+modulate = Color( 1, 1, 1, 0.854902 )
+margin_right = 512.0
+margin_bottom = 512.0
+texture = ExtResource( 2 )
+
+[node name="Sprites" type="Control" parent="."]
+margin_left = -130.813
+margin_top = -59.4604
+margin_right = -90.8129
+margin_bottom = -19.4604
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="Sprites"]
+margin_left = 252.813
+margin_top = 75.4604
+margin_right = 573.813
+margin_bottom = 120.46
+text = "DO YOUR CHORES"
+align = 1
+valign = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = 379.0
+margin_top = 64.0
+margin_right = 566.0
+margin_bottom = 273.0
+color = Color( 0.129412, 0.129412, 0.129412, 1 )
+
+[node name="LabelContainer" type="VBoxContainer" parent="."]
+margin_left = 413.0
+margin_top = 76.0
+margin_right = 553.0
+margin_bottom = 252.0
+custom_constants/separation = 5
+
+[node name="Label" type="Label" parent="LabelContainer"]
+margin_right = 140.0
+margin_bottom = 14.0
+text = "CHORE BOARD B"
+
+[node name="WhirlShader" type="ColorRect" parent="."]
+material = SubResource( 1 )
+margin_left = 1.0
+margin_right = 641.0
+margin_bottom = 360.0
+mouse_filter = 2
+
+[node name="AddLabel" type="Button" parent="."]
+margin_left = 114.0
+margin_top = 172.0
+margin_right = 351.0
+margin_bottom = 206.0
+text = "Add Another Chore ->"
+
+[node name="MainMenu" type="Button" parent="."]
+margin_left = 396.0
+margin_top = 282.0
+margin_right = 559.0
+margin_bottom = 330.0
+focus_neighbour_bottom = NodePath("../New")
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 4 )
+text = "MAIN MENU"
+
+[node name="Previous" type="Button" parent="."]
+margin_left = 19.0
+margin_top = 89.0
+margin_right = 187.0
+margin_bottom = 123.0
+text = "<- PREVIOUS SCENE"
+
+[node name="Debug" type="Label" parent="."]
+margin_left = 52.0
+margin_top = 309.0
+margin_right = 217.0
+margin_bottom = 323.0
+text = "DEV: Press ~ for debug console"
+
+[connection signal="pressed" from="AddLabel" to="." method="_on_AddLabel_pressed"]
+[connection signal="pressed" from="MainMenu" to="." method="_on_MainMenu_pressed"]
+[connection signal="pressed" from="Previous" to="." method="_on_Previous_pressed"]

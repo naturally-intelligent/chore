@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://menus/credits.gd" type="Script" id=2]
+
+[node name="Credits" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+
+[node name="BG" type="ColorRect" parent="."]
+margin_right = 640.0
+margin_bottom = 360.0
+color = Color( 0.203922, 0.286275, 0.360784, 1 )
+
+[node name="Title" type="Label" parent="."]
+margin_top = 29.0
+margin_right = 213.0
+margin_bottom = 47.0
+rect_scale = Vector2( 3, 3 )
+custom_colors/font_color = Color( 0.313726, 0.505882, 0.819608, 1 )
+text = "CHORE ENGINE"
+align = 1
+valign = 1
+
+[node name="Notes" type="Label" parent="."]
+margin_top = 283.0
+margin_right = 638.0
+margin_bottom = 359.0
+custom_colors/font_color = Color( 0.435294, 0.678431, 0.890196, 1 )
+custom_constants/line_spacing = 4
+text = "www.naturallyintelligent.com
+
+\"Chore Engine\" Copyright YEAR
+Naturally Intelligent
+"
+align = 1
+
+[node name="BackButton" type="Button" parent="."]
+margin_left = 500.0
+margin_top = 305.0
+margin_right = 575.0
+margin_bottom = 337.0
+text = "BACK"
+
+[node name="CodeText" type="RichTextLabel" parent="."]
+margin_left = 128.0
+margin_top = 105.0
+margin_right = 519.0
+margin_bottom = 261.0
+mouse_filter = 2
+custom_colors/default_color = Color( 0.54902, 0.784314, 0.811765, 1 )
+custom_constants/line_separation = 3
+bbcode_enabled = true
+bbcode_text = "[center]FRAMEWORK FOR GODOT
+
+- Open Source - Free to Use - MIT License -
+
+[i]\"Wow! I love not having to doing chores! 
+Thanks Chore Engine!\"[/i]
+
+CODE:
+David Kerr[/center]"
+text = "FRAMEWORK FOR GODOT
+
+- Open Source - Free to Use - MIT License -
+
+\"Wow! I love not having to doing chores! 
+Thanks Chore Engine!\"
+
+CODE:
+David Kerr"

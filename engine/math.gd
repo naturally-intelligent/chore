@@ -1,0 +1,86 @@
+tool
+extends Node
+
+# rounds a vector2d
+static func round_angle_to_degree(normal: Vector2, angle_in_degrees: float) -> Vector2:
+	var angle = normal.angle()
+	angle = stepify(angle, deg2rad(angle_in_degrees))
+	return Vector2(cos(angle), sin(angle))
+
+# rounds a vector2d and returns angle
+static func round_angle_to_degree_with_angle(normal: Vector2, angle_in_degrees: float) -> Array:
+	var angle = normal.angle()
+	angle = stepify(angle, deg2rad(angle_in_degrees))
+	return [Vector2(cos(angle), sin(angle)), rad2deg360(angle)]
+
+static func angle_frame_45(angle: int) -> int:
+	return int(clamp(angle,0,359) / 45)
+
+static func angle_frame_90(angle: int) -> int:
+	return int(clamp(angle,0,359) / 90)
+
+static func rad2deg360(radians) -> int:
+	var degrees = rad2deg(radians)
+	if degrees < 0:
+		degrees += 360
+	return int(degrees)
+
+static func nearest_position(parent, position):
+	var nearest = 1000*1000
+	var nearest_pos = false
+	for node in parent.get_children():
+		var dist2 = position.distance_squared_to(node.position)
+		if dist2 < nearest:
+			nearest_pos = node.position
+			nearest = dist2
+	return nearest_pos
+
+static func nearest_global_position(parent, position):
+	var nearest = 1000*1000
+	var nearest_pos = false
+	for node in parent.get_children():
+		var dist2 = position.distance_squared_to(node.global_position)
+		if dist2 < nearest:
+			nearest_pos = node.global_position
+			nearest = dist2
+	return nearest_pos
+
+static func normal_to_degrees(n):
+	return atan2(n.y, n.x) * 180 / PI
+
+static func normal_to_360_degrees(n):
+	var theta = atan2(n.y, n.x)
+	var deg = rad2deg(theta)
+	if deg < 0: deg += 360
+	return deg
+
+static func normal_to_45(n):
+	var deg = normal_to_360_degrees(n)
+	return stepify(deg, 45)
+
+static func quadratic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, t: float):
+	var q0 = p0.linear_interpolate(p1, t)
+	var q1 = p1.linear_interpolate(p2, t)
+	return [q0, q1]
+
+static func cubic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
+	var q0 = p0.linear_interpolate(p1, t)
+	var q1 = p1.linear_interpolate(p2, t)
+	var q2 = p2.linear_interpolate(p3, t)
+
+	var r0 = q0.linear_interpolate(q1, t)
+	var r1 = q1.linear_interpolate(q2, t)
+
+	var s = r0.linear_interpolate(r1, t)
+	return s
+
+static func move_towards(target, current, amount):
+	if target > current:
+		if current + amount >= target:
+			return target
+		return current + amount
+	elif target < current:
+		if current - amount <= target:
+			return target
+		return current - amount
+	return current

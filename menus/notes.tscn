@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://menus/notes.gd" type="Script" id=1]
+
+[node name="Notes" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="BG" type="ColorRect" parent="."]
+margin_right = 640.0
+margin_bottom = 360.0
+color = Color( 0.282353, 0.282353, 0.282353, 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = 46.0
+margin_top = 61.0
+margin_right = 592.0
+margin_bottom = 264.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="Title" type="Label" parent="."]
+margin_left = 3.0
+margin_top = 10.0
+margin_right = 303.0
+margin_bottom = 28.0
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color = Color( 0.729412, 0.537255, 0.447059, 1 )
+text = "CHORE NOTES"
+align = 1
+valign = 1
+
+[node name="File" type="RichTextLabel" parent="."]
+margin_left = 58.0
+margin_top = 72.0
+margin_right = 582.0
+margin_bottom = 257.0
+mouse_filter = 2
+custom_colors/default_color = Color( 0.686275, 0.686275, 0.686275, 1 )
+custom_constants/line_separation = 3
+
+[node name="Notes" type="Label" parent="."]
+margin_left = -60.0
+margin_top = 291.0
+margin_right = 578.0
+margin_bottom = 367.0
+custom_colors/font_color = Color( 0.729412, 0.537255, 0.447059, 1 )
+custom_constants/line_spacing = 4
+text = "\"Doing chores so you don't have to - since 2022\" 
+quote from Chore Engine after it becomes sentient, circa 2044"
+align = 1
+
+[node name="BackButton" type="Button" parent="."]
+margin_left = 504.0
+margin_top = 294.0
+margin_right = 579.0
+margin_bottom = 326.0
+text = "BACK"

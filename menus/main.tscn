@@ -1,0 +1,128 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://menus/main.gd" type="Script" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[node name="MainMenu" type="Control"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 8 )
+
+[node name="BG" type="ColorRect" parent="."]
+margin_right = 640.0
+margin_bottom = 360.0
+color = Color( 1, 1, 1, 0 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = 168.0
+margin_top = 14.0
+margin_right = 480.0
+margin_bottom = 330.0
+color = Color( 0.133333, 0.180392, 0.611765, 1 )
+
+[node name="Title" type="Label" parent="."]
+margin_left = 202.0
+margin_top = 17.0
+margin_right = 317.0
+margin_bottom = 45.0
+rect_scale = Vector2( 2, 2 )
+text = "CHORE ENGINE"
+align = 1
+valign = 1
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+margin_left = 260.0
+margin_top = 111.0
+margin_right = 396.0
+margin_bottom = 257.0
+custom_constants/separation = 7
+alignment = 1
+
+[node name="Play" type="Button" parent="Buttons"]
+margin_right = 136.0
+margin_bottom = 20.0
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 1 )
+text = "PLAY"
+flat = true
+
+[node name="Restart" type="Button" parent="Buttons"]
+margin_top = 27.0
+margin_right = 136.0
+margin_bottom = 47.0
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 1 )
+text = "RESTART"
+flat = true
+
+[node name="Settings" type="Button" parent="Buttons"]
+margin_top = 54.0
+margin_right = 136.0
+margin_bottom = 74.0
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 1 )
+text = "SETTINGS"
+flat = true
+
+[node name="Credits" type="Button" parent="Buttons"]
+margin_top = 81.0
+margin_right = 136.0
+margin_bottom = 101.0
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 3 )
+text = "CREDITS"
+flat = true
+
+[node name="Notes" type="Button" parent="Buttons"]
+margin_top = 108.0
+margin_right = 136.0
+margin_bottom = 128.0
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 1 )
+text = "NOTES"
+flat = true
+
+[node name="Quit" type="Button" parent="Buttons"]
+margin_top = 135.0
+margin_right = 136.0
+margin_bottom = 155.0
+focus_neighbour_bottom = NodePath("../New")
+custom_colors/font_color = Color( 0.627451, 0.658824, 0.690196, 1 )
+custom_colors/font_color_hover = Color( 1, 1, 0.647059, 1 )
+custom_styles/focus = SubResource( 4 )
+text = "QUIT"
+flat = true
+
+[node name="Demo" type="Label" parent="."]
+modulate = Color( 0.8, 0.8, 0.8, 1 )
+margin_left = 279.0
+margin_top = 62.0
+margin_right = 356.0
+margin_bottom = 76.0
+text = "(DEMO APP)"
+
+[node name="Copyright" type="Label" parent="."]
+modulate = Color( 0.611765, 0.611765, 0.611765, 1 )
+margin_left = 258.0
+margin_top = 301.0
+margin_right = 484.0
+margin_bottom = 315.0
+text = "YEAR Naturally Intelligent"
+
+[node name="Version" type="Label" parent="."]
+margin_left = 436.0
+margin_top = 38.0
+margin_right = 483.0
+margin_bottom = 52.0
+text = "VER"
