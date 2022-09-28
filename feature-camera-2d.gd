@@ -224,5 +224,19 @@ func set_camera_limits(left_x, right_x, top_y=false, bottom_y=false):
 	if bottom_y: limit_bottom = bottom_y
 	
 func reset_camera_limits():
+	if smoothing_speed > 1:
+		set_smoothing_speed_temporarily()
 	limit_left = initial_camera_left_limit
 	limit_right = initial_camera_right_limit
+
+func set_smoothing_speed_temporarily(speed=1, time=2.5):
+	var old_speed = smoothing_speed
+	smoothing_speed = speed
+	var tween = Tween.new()
+	tween.interpolate_property(self,
+		'smoothing_speed', speed, old_speed, time,
+		Tween.TRANS_CUBIC, Tween.EASE_IN)
+	add_child(tween)
+	tween.start()
+	yield(tween, "tween_all_completed")
+	tween.queue_free()

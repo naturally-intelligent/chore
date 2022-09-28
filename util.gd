@@ -212,8 +212,8 @@ static func random_colors(one,two):
 static func rgb100_to_color(r,g,b):
 	return Color(r/100.0, g/100.0, b/100.0, 1)
 
-static func rgb256_to_color(r,g,b):
-	return Color(r/256.0, g/256.0, b/256.0, 1)
+static func rgb256_to_color(r,g,b,a=1.0):
+	return Color(r/256.0, g/256.0, b/256.0, a)
 
 static func thousands_sep(number, prefix=''):
 	number = int(number)
