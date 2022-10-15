@@ -54,6 +54,9 @@ var transition_slide_out_direction_scene_to_menu = 'down' # false or a direction
 # ROOT / HUD / Mouse + Menu Layer Priority
 var root_overlay_canvas_layer = 111
 
+# UI
+var root_capture_ui_cancel = true
+
 # MUSIC
 var music_ext = '.ogg'
 var music_dirs = ['music']

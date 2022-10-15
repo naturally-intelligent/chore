@@ -16,7 +16,6 @@ func _ready():
 	game.massage_label($Version)
 	set_default_menu_button($Buttons/Play)
 	
-	audio.connect("music_volume_changed", self, "on_music_volume_changed")
 	audio.play_music('main-menu')
 	
 	# VERSION

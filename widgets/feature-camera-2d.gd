@@ -31,8 +31,13 @@ const look_ahead_trans = Tween.TRANS_SINE
 const look_ahead_ease = Tween.EASE_OUT
 const look_ahead_time = 1.5
 
+export (NodePath) var left_limit_position = null
+export (NodePath) var right_limit_position = null
+
 onready var last_camera_position = get_camera_position()
 var last_camera_direction_x = 0
+var initial_camera_left_limit = 0
+var initial_camera_right_limit = 0
 
 func _ready():
 	randomize()
@@ -41,7 +46,15 @@ func _ready():
 	noise.octaves = 2
 	$PunchTimer.connect("timeout", self, "after_punch")
 	#$TargetAheadTimer.connect("timeout", self, "target_ahead_buffer")
-
+	if has_node('LeftLimit'):
+		var node = get_node('LeftLimit')
+		limit_left = node.global_position.x
+	if has_node('RightLimit'):
+		var node = get_node('RightLimit')
+		limit_right = node.global_position.x
+	initial_camera_left_limit = limit_left
+	initial_camera_right_limit = limit_right
+	
 func _physics_process(delta):
 	if target:
 		if target_ahead:
@@ -203,3 +216,27 @@ func npc_punch(_target=null, wait=0.25, zoom_factor=0.5):
 		zoom_to(zoom_factor)
 		$PunchTimer.wait_time = wait
 		$PunchTimer.start()
+
+func set_camera_limits(left_x, right_x, top_y=false, bottom_y=false):
+	limit_left = left_x
+	limit_right = right_x
+	if top_y: limit_top = top_y
+	if bottom_y: limit_bottom = bottom_y
+	
+func reset_camera_limits():
+	if smoothing_speed > 1:
+		set_smoothing_speed_temporarily()
+	limit_left = initial_camera_left_limit
+	limit_right = initial_camera_right_limit
+
+func set_smoothing_speed_temporarily(speed=1, time=2.5):
+	var old_speed = smoothing_speed
+	smoothing_speed = speed
+	var tween = Tween.new()
+	tween.interpolate_property(self,
+		'smoothing_speed', speed, old_speed, time,
+		Tween.TRANS_CUBIC, Tween.EASE_IN)
+	add_child(tween)
+	tween.start()
+	yield(tween, "tween_all_completed")
+	tween.queue_free()

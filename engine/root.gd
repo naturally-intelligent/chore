@@ -45,7 +45,7 @@ var has_quit := false
 #  usually only 1 is visible (sometimes 2 for example during slide transitions)
 var scene_container_style := 'pool'
 onready var scenes_root: Control = $Scenes
-# menus do stack, first-in-last-out 
+# menus do stack, first-in-last-out
 #  more than one menu may be visible, and may be overlaid on top of the scenes
 var menu_container_style := 'stack'
 onready var menus_root: Control = $Overlay/Menus
@@ -87,28 +87,28 @@ func _ready():
 
 # called by menus.show()
 func switch_to_menu(menu, menu_name, menu_data=false, info={}, transitions={}):
-	if 'switch_target' in info: 
+	if 'switch_target' in info:
 		info['switch_target'] = info['switch_target']
 	else:
 		info['switch_target'] = 'menu'
-	if 'switch_origin' in info: 
+	if 'switch_origin' in info:
 		info['switch_origin'] = info['switch_origin']
 	else:
 		info['switch_origin'] = current_scene_type
 	reset_time_scale()
-	_switch_prepare(menu, menu_name, menu_data, info, transitions)	
+	_switch_prepare(menu, menu_name, menu_data, info, transitions)
 
 # called by scenes.show()
 func switch_to_scene(scene, scene_name, scene_data=false, info={}, transitions={}):
-	if 'switch_target' in info: 
+	if 'switch_target' in info:
 		info['switch_target'] = info['switch_target']
 	else:
 		info['switch_target'] = 'scene'
-	if 'switch_origin' in info: 
+	if 'switch_origin' in info:
 		info['switch_origin'] = info['switch_origin']
 	else:
 		info['switch_origin'] = current_scene_type
-	_switch_prepare(scene, scene_name, scene_data, info, transitions)	
+	_switch_prepare(scene, scene_name, scene_data, info, transitions)
 
 func _switch_prepare(scene, scene_name, scene_data=false, info={}, transitions={}):
 	var switch_target = info['switch_target']
@@ -171,7 +171,7 @@ func _switch_prepare(scene, scene_name, scene_data=false, info={}, transitions={
 		if switch_origin == 'menu' and switch_target == 'scene':
 			transitions['out_direction'] = settings.transition_slide_out_direction_scene_to_menu
 	# SWITCH
-	_soft_switch(scene, scene_name, scene_data, info, transitions)	
+	_soft_switch(scene, scene_name, scene_data, info, transitions)
 
 # called by scenes.show()
 func _soft_switch(scene, scene_name, scene_data, info, transitions):
@@ -281,9 +281,9 @@ func _pre_delete_scenes(info):
 	var switch_target = info['switch_target']
 	var target_root = get_scene_container(switch_target)
 	var removal_method = 'hide'
-	if 'remove' in info: 
+	if 'remove' in info:
 		removal_method = 'delete'
-	if 'clear' in info: 
+	if 'clear' in info:
 		removal_method = 'delete_all'
 	# removal
 	if removal_method == 'delete':
@@ -397,23 +397,23 @@ func _resume_current_scene():
 				resume()
 
 func get_scene_container(scene_type: String) -> Control:
-	if scene_type == 'scene': 
+	if scene_type == 'scene':
 		return scenes_root
-	if scene_type == 'menu': 
+	if scene_type == 'menu':
 		return menus_root
 	#debug.print("WARNING: unknown scene container type!", scene_type)
 	return scenes_root
-	
+
 func get_container_style(scene_type: String) -> String:
-	if scene_type == 'scene': 
+	if scene_type == 'scene':
 		return scene_container_style # pool
-	if scene_type == 'menu': 
+	if scene_type == 'menu':
 		return menu_container_style # stack
 	#debug.print("WARNING: unknown scene container type!", scene_type)
 	return 'pool'
 
 # CLEAR / DELETE / HIDE / SHOW SCENES
-	
+
 func clear_scenes():
 	var remove = []
 	for child in root.scenes_root.get_children():
@@ -453,7 +453,7 @@ func clear_menus_above(menu):
 			found = true
 	for child in remove:
 		root.menus_root.remove_child(child)
-	
+
 # for running from F6 within godot editor
 func check_is_root_scene(scene, scene_name):
 	if not root_scene:
@@ -501,7 +501,7 @@ func scale_transitions():
 	if game.pixel_width > 640:
 		$Overlay/Transitions.rect_scale.x = game.pixel_width / 640
 		$Overlay/Transitions.rect_scale.y = game.pixel_height / 320
-	
+
 func scale_cursor():
 	# if you use this, reimport mouse cursor texture with no filter
 	if game.pixel_width > settings.scale_mouse_cursor_w:
@@ -537,7 +537,7 @@ func _input(event):
 		update_mouse()
 	# common keys
 	else:
-		if Input.is_action_just_pressed("ui_cancel"):
+		if settings.root_capture_ui_cancel and Input.is_action_just_pressed("ui_cancel"):
 			menus.back()
 		if Input.is_action_just_pressed("ui_fullscreen"):
 			util.fullscreen_flip()
@@ -595,7 +595,7 @@ func update_ui():
 		update_mouse()
 	update_debug()
 	update_hud()
-	
+
 func reset_overlay():
 	for node in $Overlay.get_children():
 		node.visible = false
@@ -734,7 +734,7 @@ func _transition_in(transitions):
 			yield(self, "transition_finished")
 		hide_transitions()
 	emit_signal("switch_transition_finished")
-	
+
 func fade_out_and_quit():
 	resume()
 	# transition?
@@ -748,7 +748,7 @@ func fade_out_and_quit():
 			yield(self, "transition_finished")
 	# quit
 	quit()
-	
+
 func transition_wait(middle_time=0.3):
 	if dev.skip_transitions:
 		emit_signal("transition_finished")
@@ -769,8 +769,8 @@ func transition_fade_out(fade_time=0.3):
 	var transition = $Overlay/Transitions/Fader
 	transition.visible = true
 	var tween = $Overlay/Transitions/Fader/Tween
-	tween.interpolate_property(transition, "modulate", 
-	  Color(1, 1, 1, 0), Color(1, 1, 1, 1), game.time(fade_time), 
+	tween.interpolate_property(transition, "modulate",
+	  Color(1, 1, 1, 0), Color(1, 1, 1, 1), game.time(fade_time),
 	  Tween.TRANS_LINEAR, Tween.EASE_IN)
 	tween.start()
 	yield(tween, "tween_completed")
@@ -785,13 +785,13 @@ func transition_fade_in(fade_time=0.3):
 	var transition = $Overlay/Transitions/Fader
 	transition.visible = true
 	var tween = $Overlay/Transitions/Fader/Tween
-	tween.interpolate_property(transition, "modulate", 
-	  Color(1, 1, 1, 1), Color(1, 1, 1, 0), game.time(fade_time), 
+	tween.interpolate_property(transition, "modulate",
+	  Color(1, 1, 1, 1), Color(1, 1, 1, 0), game.time(fade_time),
 	  Tween.TRANS_LINEAR, Tween.EASE_IN)
 	tween.start()
 	yield(tween, "tween_completed")
 	emit_signal("transition_finished")
-	
+
 func transition_fade_out_stagger(fade_out_time=0.2):
 	if dev.skip_transitions:
 		emit_signal("transition_finished")
@@ -826,7 +826,7 @@ func transition_fade_in_stagger(fade_in_time=0.3):
 		transition.modulate = Color(1, 1, 1, a)
 		var timer = util.wait(game.time(fade_in_step_time), self)
 		yield(timer, "timeout")
-	emit_signal('transition_finished')	
+	emit_signal('transition_finished')
 
 func transition_slide(scene, in_out, direction, time=0.5):
 	scene.visible = true
@@ -871,7 +871,7 @@ func transition_slide(scene, in_out, direction, time=0.5):
 	tween.queue_free()
 	$Timers.remove_child(tween)
 	emit_signal('transition_finished')
-	
+
 func transition_slide_both(old, new, direction, time=0.5):
 	#new.rect_position = Vector2(game.pixel_width*dir, 0)
 	new.visible = true
@@ -923,7 +923,7 @@ func transition_slide_both(old, new, direction, time=0.5):
 	old_tween.queue_free()
 	$Timers.remove_child(old_tween)
 	emit_signal('transition_finished')
-	
+
 func black_box_slide():
 	enable_transitions()
 	$Overlay/Transitions.visible = true
@@ -937,14 +937,14 @@ func black_box_slide():
 	$Overlay/Transitions/Box/Bottom.visible = false
 	$Overlay/Transitions/Box/Right.visible = false
 	$Overlay/Transitions/Box/Left.visible = false
-	#tween.interpolate_property(material, "slide", 
-	#  1.0, 0.0, fade_time, 
+	#tween.interpolate_property(material, "slide",
+	#  1.0, 0.0, fade_time,
 	#  Tween.TRANS_LINEAR, Tween.EASE_IN)
 	var start_slide = 1.0
 	var end_slide = 0.0
 	material.set_shader_param("slide", start_slide)
-	tween.interpolate_method(self, "set_box_slide", 
-	  start_slide, end_slide, game.time(time), 
+	tween.interpolate_method(self, "set_box_slide",
+	  start_slide, end_slide, game.time(time),
 	  Tween.TRANS_LINEAR, Tween.EASE_IN)
 	tween.start()
 	yield(tween, "tween_completed")
@@ -957,13 +957,13 @@ func set_box_slide(value):
 	var material = transition.get_material()
 	material.set_shader_param("slide", value)
 
-# SCREENSHOTS	
+# SCREENSHOTS
 
 func auto_screenshot():
 	debug.print('autoscreenshot')
 	if current_scene:
 		util.screenshot(self, dev.autoscreenshot_resolution)
-	
+
 func flip_autoscreenshot():
 	if not game.release:
 		if $Timers/Screenshot.is_stopped():
@@ -986,7 +986,7 @@ func update_debug():
 	$Overlay/Debug.visible = false
 	if dev.debug_overlay:
 		$Overlay/Debug.visible = true
-	
+
 func set_debug_info(text):
 	$Overlay/Debug.visible = true
 	$Overlay/Debug/Info.set_text(text)
@@ -1015,7 +1015,7 @@ func flip_console():
 
 func is_console_visible():
 	return $Overlay/Debug.visible
-	
+
 func show_console_readme():
 	debug_lines = []
 	add_debug_line('~ show/hide')
@@ -1040,7 +1040,7 @@ func debug_scene_roots():
 		count += 1
 	debug.print('current_scene_name = ' + current_scene_name)
 	debug.print('current_scene_type = ' + current_scene_type)
-	
+
 # HUD
 # - an empty node that you can add scenes to with some convenience methods
 
@@ -1063,7 +1063,7 @@ func update_hud():
 				child.update_hud()
 	else:
 		hide_hud()
-		
+
 func show_hud():
 	$Overlay/HUD.visible = true
 	for child in $Overlay/HUD.get_children():
@@ -1074,7 +1074,7 @@ func hide_hud():
 
 func is_hud_visible():
 	return $Overlay/HUD.visible
-	
+
 func set_hud_text(text):
 	for child in $Overlay/HUD.get_children():
 		if child.has_method('set_text'):
@@ -1099,7 +1099,7 @@ func add_hud(hud):
 func remove_hud():
 	for child in $Overlay/HUD.get_children():
 		child.queue_free()
-		
+
 # MISC
 
 func has_text_entry():
@@ -1112,14 +1112,14 @@ func has_text_entry():
 
 func pause():
 	get_tree().paused = true
-	
+
 func resume():
 	get_tree().paused = false
 
 func stop_frame():
 	pause()
 	Engine.time_scale = 0
-		
+
 func reset():
 	Engine.time_scale = 1
 
@@ -1204,7 +1204,7 @@ func command_line_start():
 	if !game.release:
 		if '-menu' in settings.args:
 			game.launch_menu = settings.args['-menu']
-	
+
 # QUIT
 
 func quit():

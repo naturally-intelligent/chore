@@ -110,23 +110,27 @@ func get_choice_button():
 func hide_backgrounds():
 	for child in $Bubble/Backgrounds.get_children():
 		child.visible = false
-		
+
 func set_background(bg_name):
 	hide_backgrounds()
-	var node = $Bubble/Backgrounds.get_node(bg_name)
+	var node = $Bubble/Backgrounds.get_node_or_null(bg_name)
 	if node:
 		node.visible = true
 	else:
 		pass
 
 func get_button(b_name):
-	var node = $Bubble/Backgrounds.get_node(b_name)
+	var node = $Bubble/Backgrounds.get_node_or_null(b_name)
 	return node
 
 func disable_button():
-	get_button("ChoiceButton").disabled = true
-	get_button("AdvanceButton").disabled = true
-	
+	var button1 = get_button("ChoiceButton")
+	if button1: button1.disabled = true
+	var button2 = get_button("AdvanceButton")
+	if button2: button2.disabled = true
+
 func enable_button():
-	get_button("ChoiceButton").disabled = false
-	get_button("AdvanceButton").disabled = false
+	var button1 = get_button("ChoiceButton")
+	if button1: button1.disabled = false
+	var button2 = get_button("AdvanceButton")
+	if button2: button2.disabled = false

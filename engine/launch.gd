@@ -12,7 +12,7 @@ func _init():
 
 func _ready():
 	# hide editor splash (first menu you see when opening Godot project)
-	if has_node("EditorSplash"): 
+	if has_node("EditorSplash"):
 		$EditorSplash.visible = false
 	# show first menu
 	if game.release:

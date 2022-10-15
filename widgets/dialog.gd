@@ -3,12 +3,12 @@ extends VBoxContainer
 # a Dialog container
 # Copyright (C) 2018 Naturally Intelligent
 
-const dialog_bubble_tscn = preload('res://widgets/dialog-bubble.tscn')
+var dialog_bubble_tscn
 
 # BUBBLE STYLE
 enum BubbleStyle {
 	DEFAULT_GRAY,
-	TURQUOISE_ROUND, GREEN_ROUND, 
+	TURQUOISE_ROUND, GREEN_ROUND,
 	RED_SQUARE, DOUBLE_RED_LINE,
 }
 export(String) var dialog_id = ""
@@ -17,6 +17,12 @@ export(bool) var font_color_override = false
 export(Color, RGBA) var font_color = Color(1,1,1,1)
 export(int) var fading_bubbles = 0
 export(float) var fade_alpha = 0.2
+# if the text is only one line, add this to the bubble size
+export(int) var extra_one_line_bubble_height = 0
+# if the text more than one line, subtract from the bubble size * lines-1
+export(int) var extra_multiline_bubble_height_multiplier = 0
+export(bool) var check_key_input = true
+export(int) var inner_bubble_margins = 19
 
 var white_fonts = [BubbleStyle.DEFAULT_GRAY]
 
@@ -45,6 +51,13 @@ var talk_script = false
 var bubble_grow_time = 0.25
 var next_action_timer = 0
 var next_action_delay = bubble_grow_time + 1.5 # delay until user can do something
+
+func _init():
+	dialog_bubble_tscn = load(settings.dialog_bubble_tscn)
+
+func ready():
+	if not check_key_input:
+		set_process_unhandled_key_input(false)
 
 func widget():
 	return self
@@ -99,7 +112,7 @@ func _process(delta):
 				dialog_action = false
 	if fading_bubbles > 0:
 		fade()
-	
+
 # connects to parent scene nodes (may not be necessary or wanted)
 func connect_scene(scene):
 	if scene.has_node('DialogBackButton'):
@@ -114,11 +127,11 @@ func set_bubble_style(style):
 	# set font color (doesnt help in editor)
 	#if not (bubble_style in white_fonts):
 	#	font_color = Color(0,0,0,1)
-	
+
 func bump_dialog(plus_y=0):
 	if !dialog_action:
 		var size_y = get_minimum_size().y
-		if size_y > dialog_size.y: 
+		if size_y > dialog_size.y:
 			size_y += plus_y
 			set_position(Vector2(dialog_position.x, dialog_position.y - (size_y-dialog_size.y)))
 
@@ -136,7 +149,7 @@ func build_dialog(text, type='dialog'):
 		dialog_action = false
 	visible = true
 	var max_bubble_width = dialog_size.x
-	var inner_text_width = max_bubble_width - 19
+	var inner_text_width = max_bubble_width - inner_bubble_margins
 	var line_spacing = 2 # todo: get from text label
 	# bubble background (ninepatchrect)
 	var dialog_bubble = dialog_bubble_tscn.instance()
@@ -193,11 +206,17 @@ func build_dialog(text, type='dialog'):
 		var separation = 2 #self.get_custom_constant('separation')
 		self.bump_dialog(bump_height + separation)
 
+	if text_lines == 1:
+		bubble_height += extra_one_line_bubble_height
+	if text_lines > 1:
+		bubble_height += extra_multiline_bubble_height_multiplier * (text_lines-1)
+
 	bubble.set_h_size_flags(1)
 	#dialog_bubble.set_size_direct(bubble_width, bubble_height, formatted_text)
 	#dialog_bubble.grow_animation(bubble_width, bubble_height, bubble_grow_time, formatted_text)
-	return [dialog_bubble, bubble_width, bubble_height, bubble_grow_time, formatted_text]
-	return dialog_bubble
+	# changed to return original text to preserve bbcode, may cause issue?
+	return [dialog_bubble, bubble_width, bubble_height, bubble_grow_time, text]
+	#return dialog_bubble
 
 	# set size
 	#bubble.set_size(Vector2(bubble_width, bubble_height))
@@ -299,8 +318,9 @@ func bubble_press(bubble):
 		dialog_press()
 
 func _unhandled_key_input(event):
-	if Input.is_action_pressed("ui_accept"):
-		dialog_press()
+	if check_key_input:
+		if Input.is_action_pressed("ui_accept"):
+			dialog_press()
 
 func clear_dialogs():
 	#delete_dialogs()
@@ -410,7 +430,7 @@ func any_animating():
 		if child.animating:
 			return true
 	return false
-	
+
 func empty():
 	if get_child_count() > 0:
 		return false
@@ -427,6 +447,6 @@ func fade():
 			var alpha = (1.0 + fading_bubbles*fade_step) - (position*fade_step)
 			#print(position, ' ', fade_bubbles, ' = ', alpha)
 			child.modulate.a = alpha
-	#$Tween.interpolate_property($AnimatedSprite, "modulate", 
-	#    Color(1, 1, 1, 1), Color(1, 1, 1, 0), 2.0, 
-	#    Tween.TRANS_LINEAR, Tween.EASE_IN)			
+	#$Tween.interpolate_property($AnimatedSprite, "modulate",
+	#    Color(1, 1, 1, 1), Color(1, 1, 1, 0), 2.0,
+	#    Tween.TRANS_LINEAR, Tween.EASE_IN)

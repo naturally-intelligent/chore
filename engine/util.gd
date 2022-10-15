@@ -83,13 +83,21 @@ static func random(s, e):
 static func random_boolean():
 	return ((randi()%2) == 0)
 
-static func randomi(s, e):
+static func random_int(s, e):
 	var div = e-s+1
 	if div == 0: return s
 	return s + randi()%div
 
-static func randomf(s, e):
-	return s + randf()*(e-s)+s
+static func randomi(s, e):  # shortened version of random_int
+	var div = e-s+1
+	if div == 0: return s
+	return s + randi()%div
+
+static func random_float(s, e):
+	return randf()*(e-s)+s
+
+static func randomf(s, e): # shortened version of random_float
+	return randf()*(e-s)+s
 
 static func random_array(a):
 	if a.size() > 0:
@@ -105,7 +113,7 @@ static func random_array_index(a):
 
 static func random_set(s):
 	return random_array(s)
-	
+
 static func random_key(dict):
 	var keys = dict.keys()
 	if keys.size() > 0:
@@ -134,8 +142,15 @@ static func random_integer_key(dict):
 		return null
 
 static func random_vector():
-	var angle = util.randomf(0,PI)
+	var angle = util.random_float(0,PI)
 	return Vector2(cos(angle), sin(angle))
+
+static func random_left_right_up_vector(left_right_scale=1.0, up_scale=1.0):
+	var angle = util.random_float(0,PI)
+	var v = Vector2(cos(angle), sin(angle))
+	v.x *= left_right_scale
+	v.y *= up_scale
+	return v.normalized()
 
 # dict is {} you want key from, exclude is array [] with keys you dont want again
 static func random_key_excluding(dict, exclude):
@@ -186,16 +201,16 @@ static func random_position(minx,maxx, miny,maxy):
 	return Vector2(util.randomi(minx,maxx),util.randomi(miny,maxy))
 
 static func random_color(modifier):
-	return Color(util.randomf(0,1)*modifier, 
-				 util.randomf(0,1)*modifier, 
-				 util.randomf(0,1)*modifier, 1)
+	return Color(util.random_float(0,1)*modifier,
+				 util.random_float(0,1)*modifier,
+				 util.random_float(0,1)*modifier, 1)
 
 static func randomize_color(color, modifier):
-	color.r += util.randomf(-modifier/2.0, modifier/2.0) 
+	color.r += util.random_float(-modifier/2.0, modifier/2.0)
 	color.r = clamp(color.r, 0, 1)
-	color.g += util.randomf(-modifier/2.0, modifier/2.0) 
+	color.g += util.random_float(-modifier/2.0, modifier/2.0)
 	color.g = clamp(color.g, 0, 1)
-	color.b += util.randomf(-modifier/2.0, modifier/2.0) 
+	color.b += util.random_float(-modifier/2.0, modifier/2.0)
 	color.b = clamp(color.b, 0, 1)
 	return color
 
@@ -205,8 +220,8 @@ static func random_colors(one,two):
 static func rgb100_to_color(r,g,b):
 	return Color(r/100.0, g/100.0, b/100.0, 1)
 
-static func rgb256_to_color(r,g,b):
-	return Color(r/256.0, g/256.0, b/256.0, 1)
+static func rgb256_to_color(r,g,b,a=1.0):
+	return Color(r/256.0, g/256.0, b/256.0, a)
 
 static func thousands_sep(number, prefix=''):
 	number = int(number)
@@ -285,7 +300,7 @@ static func clean_string(s):
 
 static func replace_fake_formatting(s):
 	return s.replace("\\n", "\n")
-	
+
 static func random_phone_number():
 	var ph = '555-'
 	ph+= str(util.random(0,9))
@@ -339,7 +354,7 @@ static func load_config(filename, split_commas=true, convert_numbers=true):
 						if value.find(',') >= 0:
 							var a = value.split(',')
 							var d = {}
-							for i in range(0,a.size()): 
+							for i in range(0,a.size()):
 								var sub_value = a[i].strip_edges(true, true)
 								if convert_numbers: sub_value = util.convert_string_to_number(sub_value)
 								d[i] = sub_value
@@ -443,7 +458,7 @@ static func wait(time, parent=null):
 	#yield(t, "timeout") # must call this outside of function!
 	return t
 
-# https://github.com/godotengine/godot/issues/14562	
+# https://github.com/godotengine/godot/issues/14562
 static func create_import_files_for_export(texture_dir):
 	var file_list = list_files_in_directory(texture_dir)
 	for file in file_list:
@@ -464,7 +479,7 @@ static func screenshot(scene, scale=false):
 	# scale after (note, doesn't upscale pixel-art nicely)
 	if scale:
 		img.resize(scale.x, scale.y, Image.INTERPOLATE_NEAREST)
-  
+
 	# Flip it on the y-axis (because it's flipped)
 	img.flip_y()
 
@@ -487,9 +502,9 @@ static func screenshot(scene, scale=false):
 		file_dir = dir + '/' + file
 	debug.print('Saving: '+file+'...')
 	img.save_png(file_dir)
-	
+
 	print('Save Location: ', OS.get_user_data_dir())
-	
+
 	return file
 
 # https://godotengine.org/qa/5175/how-to-get-all-the-files-inside-a-folder
@@ -514,14 +529,14 @@ static func strip_bbcode(text):
 	var regex = RegEx.new()
 	regex.compile('|[[\\/\\!]*?[^\\[\\]]*?]|')
 	return regex.sub(text, '', true)
-	
+
 static func open_browser(www_url):
 	return OS.shell_open(www_url)
-	
+
 static func delete_children(node):
 	for n in node.get_children():
 		node.remove_child(n)
-		n.queue_free()	
+		n.queue_free()
 
 static func opposite_direction(direction: String) -> String:
 	if direction == 'up':

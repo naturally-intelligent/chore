@@ -17,7 +17,7 @@ func _ready() -> void:
 		search_dirs.append_array(['menus','menu'])
 
 ### USER FUNCTIONS - call these to use menu system
-	
+
 func current_menu():
 	var menu_count = root.menus_root.get_child_count()
 	if menu_count > 0:
@@ -26,13 +26,9 @@ func current_menu():
 
 func show(menu_name, transitions={}, info={}, menu_data=false):
 	return thaw(menu_name, transitions, info, menu_data)
-	
-func thaw(menu_name, transitions={}, info={}, menu_data=false):	
+
+func thaw(menu_name, transitions={}, info={}, menu_data=false):
 	#debug.print('menus.show ', menu_name)
-	# already showing?
-	if root.current_scene_type == 'menu':
-		if root.current_scene_name and menu_name == root.current_scene_name:
-			return current_menu()
 	# smooth arguments
 	if info is bool: info = {}
 	if transitions is bool: transitions = {}
@@ -42,7 +38,7 @@ func thaw(menu_name, transitions={}, info={}, menu_data=false):
 		transitions['in'] = transitions_str
 		transitions['out'] = transitions_str
 		transitions['middle'] = transitions_str
-	# find or create menu 
+	# find or create menu
 	var menu = null
 	if has_in_memory(menu_name):
 		menu = retrieve_menu(menu_name)
@@ -89,9 +85,9 @@ func back():
 			menus.show(settings.main_menu_name)
 	else:
 		menus.show(settings.main_menu_name)
-	
+
 ### MAINTENANCE FUNCTIONS - Not recommended to call these in your game
-	
+
 func create_menu(menu_name):
 	var menu_file_name = find_menu_file(menu_name)
 	if menu_file_name:
@@ -99,7 +95,7 @@ func create_menu(menu_name):
 		var menu = tscn.instance()
 		menu.set_name(menu_name)
 		return menu
-			
+
 func find_menu_file(menu_name):
 	# search in directories
 	for dir in search_dirs:
@@ -116,7 +112,7 @@ func find_menu_file(menu_name):
 		if util.file_exists(menu_name+".tscn"):
 			return menu_name+".tscn"
 	return false
-	
+
 func delete_on_hide(menu_name):
 	if has_in_memory(menu_name):
 		return false
@@ -126,13 +122,13 @@ func restore_on_show(menu_name):
 	if has_in_memory(menu_name):
 		return true
 	return false
-	
+
 func load_menu_file(menu_file):
 	if util.file_exists(menu_file):
 		return load(menu_file)
 	else:
 		debug.print('ERROR: Missing menu file: ', menu_file)
-	
+
 # find menu from stack and remove any menus above it
 func retrieve_menu(menu_name):
 	var found = false
@@ -149,7 +145,7 @@ func retrieve_menu(menu_name):
 	#	menu.queue_free()
 	#	root.menus_root.remove_child(menu)
 	return found_menu
-	
+
 func has_in_memory(menu_name):
 	for menu in root.menus_root.get_children():
 		if menu.name == menu_name:

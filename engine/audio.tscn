@@ -49,6 +49,8 @@ __meta__ = {
 
 [node name="SoundLooper1" type="AudioStreamPlayer" parent="SoundLoopers"]
 
+[node name="SoundLooper2" type="AudioStreamPlayer" parent="SoundLoopers"]
+
 [node name="MusicTween" type="Tween" parent="."]
 
 [node name="MusicFadeOut" type="Tween" parent="."]

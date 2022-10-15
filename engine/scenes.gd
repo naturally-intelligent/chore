@@ -18,7 +18,7 @@ func _ready() -> void:
 		search_dirs.append_array(['scenes','scene'])
 
 ### USER FUNCTIONS - call these to use scene system
-	
+
 func current_scene():
 	var scene_count = root.scenes_root.get_child_count()
 	if scene_count > 0:
@@ -30,16 +30,12 @@ func has_scene():
 	if scene_count > 0:
 		return true
 	return false
-		
+
 func show(scene_name, transitions={}, info={}, scene_data=false):
 	return thaw(scene_name, transitions, info, scene_data)
-	
+
 func thaw(scene_name, transitions={}, info={}, scene_data=false):
 	#debug.print('scenes.show ', scene_name)
-	# already showing?
-	if root.current_scene_type == 'scene':
-		if root.current_scene_name and scene_name == root.current_scene_name:
-			return current_scene()
 	# smooth arguments
 	if info is bool: info = {}
 	if transitions is bool: transitions = {}
@@ -49,7 +45,7 @@ func thaw(scene_name, transitions={}, info={}, scene_data=false):
 		transitions['in'] = transitions_str
 		transitions['out'] = transitions_str
 		transitions['middle'] = transitions_str
-	# find or create scene 
+	# find or create scene
 	var scene = null
 	var force_refresh = false
 	if info:
@@ -69,7 +65,7 @@ func thaw(scene_name, transitions={}, info={}, scene_data=false):
 		infos[info] = true
 	root.switch_to_scene(scene, scene_name, scene_data, infos, transitions)
 	return scene
-	
+
 func fresh(scene_name, transitions=false, info=false, scene_data=false):
 	if not info: info = 'remove'
 	return thaw(scene_name, transitions, info, scene_data)
@@ -109,9 +105,9 @@ func back():
 
 func clear():
 	root.clear_scenes()
-	
+
 ### MAINTENANCE FUNCTIONS - Not recommended to call these in your game
-	
+
 func create_scene(scene_name):
 	var scene_file_name = find_scene_file(scene_name)
 	if scene_file_name:
@@ -122,7 +118,7 @@ func create_scene(scene_name):
 	else:
 		debug.print("FATAL: create_scene(): MISSING SCENE FILE:",scene_file_name)
 		return null
-			
+
 func find_scene_file(scene_name):
 	# search in directories
 	for dir in search_dirs:
@@ -139,7 +135,7 @@ func find_scene_file(scene_name):
 		if util.file_exists(scene_name+".tscn"):
 			return scene_name+".tscn"
 	return false
-	
+
 func delete_on_hide(scene_name):
 	if has_in_memory(scene_name):
 		return false
@@ -149,13 +145,13 @@ func restore_on_show(scene_name):
 	if has_in_memory(scene_name):
 		return true
 	return false
-	
+
 func load_scene_file(scene_file):
 	if util.file_exists(scene_file):
 		return load(scene_file)
 	else:
 		debug.print('ERROR: Missing scene file: ', scene_file)
-	
+
 # find scene from stack and remove any scenes above it
 func retrieve_scene(scene_name):
 	var found_scene = null
@@ -163,7 +159,7 @@ func retrieve_scene(scene_name):
 		if scene.name == scene_name:
 			found_scene = scene
 	return found_scene
-	
+
 func has_in_memory(scene_name):
 	for scene in root.scenes_root.get_children():
 		if scene.name == scene_name:
