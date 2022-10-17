@@ -53,8 +53,8 @@ config/icon="res://icon.png"
 [autoload]
 
 debug="*res://engine/debug.gd"
-util="*res://engine/util.gd"
 math="*res://engine/math.gd"
+util="*res://engine/util.gd"
 settings="*res://core/settings.gd"
 game="*res://core/game.gd"
 dev="*res://core/dev.gd"

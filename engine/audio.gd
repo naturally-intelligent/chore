@@ -99,13 +99,13 @@ func play_once(name, volume=1.0):
 
 func play_random_sound(name, total, volume=1.0, origin=false, listener=false):
 	if dev.silence: return
-	var c = util.randomi(1,total)
+	var c = math.random_int(1,total)
 	return play_sound(name + str(c), volume, origin, listener)
 
 func play_sound_pitched(name, pitch_start=0.8, pitch_end=1.2):
 	var player = play_sound(name)
 	if player:
-		player.pitch_scale = util.random_float(pitch_start, pitch_end)
+		player.pitch_scale = math.random_float(pitch_start, pitch_end)
 
 func play_ambience_sound(name, total=1, origin=false, listener=false, time=0.33, random=true):
 	if dev.silence: return
@@ -122,7 +122,7 @@ func play_ambience_sound(name, total=1, origin=false, listener=false, time=0.33,
 		else:
 			return play_random_sound(name, total, 1.0, origin, listener)
 		if random:
-			time = util.random_float(time/2,time+time/2)
+			time = math.random_float(time/2,time+time/2)
 		timer.start(time)
 
 func queue_sound(file_name, volume=1.0, allow_multiple=true):

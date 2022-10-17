@@ -48,8 +48,8 @@ You will need to set in your Project Settings:
 - autoload globals (order is important):
 
 engine/debug.gd / debug
-engine/util.gd / util
 engine/math.gd / math
+engine/util.gd / util
 your-copy/settings.gd / settings
 your-copy/game.gd / game
 your-copy/dev.gd / dev

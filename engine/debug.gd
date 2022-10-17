@@ -78,7 +78,7 @@ func dict(d, title=false):
 	for key in d:
 		var value = d[key]
 		print(str(key)+' = '+str(value))
-	
+
 # print an array
 func array(a, title=false):
 	if title:
@@ -89,7 +89,7 @@ func array(a, title=false):
 			print(str(count)+' = '+str(value))
 	elif a is Dictionary:
 		dict(a)
-				
+
 # ignore; used by debug,print()
 static func convert_string(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14):
 	var s = str(s1)
@@ -114,7 +114,7 @@ func error(s1, s2='',s3='',s4='',s5='',s6='',s7='',s8='',s9='',s10='',s11='',s12
 	var s = convert_string(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14)
 	print(s)
 	append_log(s)
-	
+
 # debug printing by "category"
 # any categories enabled will be printed to console
 #  but all will still be recorded to log
@@ -126,7 +126,7 @@ func cat(cat, s1, s2='',s3='',s4='',s5='',s6='',s7='',s8='',s9='',s10='',s11='',
 	if log_file_name:
 		var s = cat+': '+convert_string(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14)
 		append_log(s)
-	
+
 # add mode to keep log file open isntead of opening/closing each line?
 func append_log(s):
 	if log_file_name:

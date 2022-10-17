@@ -74,40 +74,22 @@ static func fullscreen_flip():
 
 static func random(s, e):
 	if typeof(s) == TYPE_INT:
-		var div = e-s+1
-		if div == 0: return s
-		return s + randi()%div
+		return math.random_int(s, e)
 	else:
-		return s + randf()*(e-s)+s
+		return math.random_float(s, e)
 
 static func random_boolean():
 	return ((randi()%2) == 0)
 
-static func random_int(s, e):
-	var div = e-s+1
-	if div == 0: return s
-	return s + randi()%div
-
-static func randomi(s, e):  # shortened version of random_int
-	var div = e-s+1
-	if div == 0: return s
-	return s + randi()%div
-
-static func random_float(s, e):
-	return randf()*(e-s)+s
-
-static func randomf(s, e): # shortened version of random_float
-	return randf()*(e-s)+s
-
 static func random_array(a):
 	if a.size() > 0:
-		var i = util.randomi(0,a.size()-1)
+		var i = math.random_int(0,a.size()-1)
 		return a[i]
 	return null
 
 static func random_array_index(a):
 	if a.size() > 0:
-		var i = util.randomi(0,a.size()-1)
+		var i = math.random_int(0,a.size()-1)
 		return i
 	return null
 
@@ -142,11 +124,11 @@ static func random_integer_key(dict):
 		return null
 
 static func random_vector():
-	var angle = util.random_float(0,PI)
+	var angle = math.random_float(0,PI)
 	return Vector2(cos(angle), sin(angle))
 
 static func random_left_right_up_vector(left_right_scale=1.0, up_scale=1.0):
-	var angle = util.random_float(0,PI)
+	var angle = math.random_float(0,PI)
 	var v = Vector2(cos(angle), sin(angle))
 	v.x *= left_right_scale
 	v.y *= up_scale
@@ -197,25 +179,22 @@ static func random_sign():
 	else:
 		return -1
 
-static func random_position(minx,maxx, miny,maxy):
-	return Vector2(util.randomi(minx,maxx),util.randomi(miny,maxy))
-
 static func random_color(modifier):
-	return Color(util.random_float(0,1)*modifier,
-				 util.random_float(0,1)*modifier,
-				 util.random_float(0,1)*modifier, 1)
+	return Color(math.random_float(0,1)*modifier,
+				math.random_float(0,1)*modifier,
+				math.random_float(0,1)*modifier, 1)
 
 static func randomize_color(color, modifier):
-	color.r += util.random_float(-modifier/2.0, modifier/2.0)
+	color.r += math.random_float(-modifier/2.0, modifier/2.0)
 	color.r = clamp(color.r, 0, 1)
-	color.g += util.random_float(-modifier/2.0, modifier/2.0)
+	color.g += math.random_float(-modifier/2.0, modifier/2.0)
 	color.g = clamp(color.g, 0, 1)
-	color.b += util.random_float(-modifier/2.0, modifier/2.0)
+	color.b += math.random_float(-modifier/2.0, modifier/2.0)
 	color.b = clamp(color.b, 0, 1)
 	return color
 
 static func random_colors(one,two):
-	return Color(util.randomf(one.r,two.r), util.randomf(one.g,two.g), util.randomf(one.b,two.b), 1)
+	return Color(math.randomf(one.r,two.r), math.randomf(one.g,two.g), math.randomf(one.b,two.b), 1)
 
 static func rgb100_to_color(r,g,b):
 	return Color(r/100.0, g/100.0, b/100.0, 1)
@@ -303,10 +282,10 @@ static func replace_fake_formatting(s):
 
 static func random_phone_number():
 	var ph = '555-'
-	ph+= str(util.random(0,9))
-	ph+= str(util.random(0,9))
-	ph+= str(util.random(0,9))
-	ph+= str(util.random(0,9))
+	ph+= str(math.random_int(0,9))
+	ph+= str(math.random_int(0,9))
+	ph+= str(math.random_int(0,9))
+	ph+= str(math.random_int(0,9))
 	return ph
 
 # loads a texxt file, sectioned like:
@@ -393,7 +372,7 @@ static func set_texture(sprite, file):
 
 static func number2words(n):
 	var num2words = {1: 'One', 2: 'Two', 3: 'Three', 4: 'Four', 5: 'Five', \
-				 6: 'Six', 7: 'Seven', 8: 'Eight', 9: 'Nine', 10: 'Ten', \
+				6: 'Six', 7: 'Seven', 8: 'Eight', 9: 'Nine', 10: 'Ten', \
 				11: 'Eleven', 12: 'Twelve', 13: 'Thirteen', 14: 'Fourteen', \
 				15: 'Fifteen', 16: 'Sixteen', 17: 'Seventeen', 18: 'Eighteen', \
 				19: 'Nineteen', 20: 'Twenty', 30: 'Thirty', 40: 'Forty', \
@@ -428,6 +407,12 @@ static func number2present(i):
 		elif last == '3':
 			return number2words(i) + 'rd'
 		return number2words(i) + 'th'
+
+static func str_no_zero(i: int) -> String:
+	if i == 0:
+		return ''
+	else:
+		return str(i)
 
 static func next_in_list(current, list : Array):
 	var index = list.find(current, 0)

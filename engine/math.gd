@@ -1,6 +1,29 @@
 tool
 extends Node
 
+### RANDOM NUMBERS
+
+static func random_int(start: int, end: int) -> int:
+	var div = end-start+1
+	if div == 0: return start
+	return start + randi()%div
+
+static func randomi(s: int, e: int) -> int:  # shortened version of random_int
+	var div = e-s+1
+	if div == 0: return s
+	return s + randi()%div
+
+static func random_float(start: float, end: float) -> float:
+	return randf()*(end-start)+start
+
+static func randomf(s: float, e: float) -> float: # shortened version of random_float
+	return randf()*(e-s)+s
+
+static func random_position(minx:int,maxx:int, miny:int,maxy:int):
+	return Vector2(random_int(minx,maxx), random_int(miny,maxy))
+
+### VECTORS AND ANGLES
+
 # rounds a vector2d
 static func round_angle_to_degree(normal: Vector2, angle_in_degrees: float) -> Vector2:
 	var angle = normal.angle()
@@ -25,6 +48,21 @@ static func rad2deg360(radians) -> int:
 		degrees += 360
 	return int(degrees)
 
+static func normal_to_degrees(n):
+	return atan2(n.y, n.x) * 180 / PI
+
+static func normal_to_360_degrees(n):
+	var theta = atan2(n.y, n.x)
+	var deg = rad2deg(theta)
+	if deg < 0: deg += 360
+	return deg
+
+static func normal_to_45(n):
+	var deg = normal_to_360_degrees(n)
+	return stepify(deg, 45)
+
+### POSITIONS
+
 static func nearest_position(parent, position):
 	var nearest = 1000*1000
 	var nearest_pos = false
@@ -45,18 +83,7 @@ static func nearest_global_position(parent, position):
 			nearest = dist2
 	return nearest_pos
 
-static func normal_to_degrees(n):
-	return atan2(n.y, n.x) * 180 / PI
-
-static func normal_to_360_degrees(n):
-	var theta = atan2(n.y, n.x)
-	var deg = rad2deg(theta)
-	if deg < 0: deg += 360
-	return deg
-
-static func normal_to_45(n):
-	var deg = normal_to_360_degrees(n)
-	return stepify(deg, 45)
+### CURVES
 
 static func quadratic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, t: float):
 	var q0 = p0.linear_interpolate(p1, t)
@@ -73,6 +100,8 @@ static func cubic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: 
 
 	var s = r0.linear_interpolate(r1, t)
 	return s
+
+### VALUES
 
 static func move_towards(target, current, amount):
 	if target > current:
