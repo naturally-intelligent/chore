@@ -127,6 +127,10 @@ static func random_vector():
 	var angle = math.random_float(0,PI)
 	return Vector2(cos(angle), sin(angle))
 
+static func random_direction(excluding=[]):
+	var dirs = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
+	return random_array_excluding(dirs, excluding)
+
 static func random_left_right_up_vector(left_right_scale=1.0, up_scale=1.0):
 	var angle = math.random_float(0,PI)
 	var v = Vector2(cos(angle), sin(angle))
@@ -497,7 +501,7 @@ static func list_files_in_directory(path):
 	var files = []
 	var dir = Directory.new()
 	dir.open(path)
-	dir.list_dir_begin()
+	dir.list_dir_begin(true, true)
 
 	while true:
 		var file = dir.get_next()
