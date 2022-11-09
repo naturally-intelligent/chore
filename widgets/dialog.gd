@@ -1,9 +1,8 @@
 extends VBoxContainer
+class_name DialogWidget
 
 # a Dialog container
 # Copyright (C) 2018 Naturally Intelligent
-
-var dialog_bubble_tscn
 
 # BUBBLE STYLE
 enum BubbleStyle {
@@ -23,6 +22,14 @@ export(int) var extra_one_line_bubble_height = 0
 export(int) var extra_multiline_bubble_height_multiplier = 0
 export(bool) var check_key_input = true
 export(int) var inner_bubble_margins = 19
+
+export(String) var dialog_bubble_scene = settings.dialog_bubble_tscn
+export(String) var choice_bubble_scene = settings.dialog_bubble_tscn
+export(String) var action_bubble_scene = settings.dialog_bubble_tscn
+
+var dialog_bubble_tscn
+var choice_bubble_tscn
+var action_bubble_tscn
 
 var white_fonts = [BubbleStyle.DEFAULT_GRAY]
 
@@ -52,22 +59,19 @@ var bubble_grow_time = 0.25
 var next_action_timer = 0
 var next_action_delay = bubble_grow_time + 1.5 # delay until user can do something
 
-func _init():
-	dialog_bubble_tscn = load(settings.dialog_bubble_tscn)
-
-func ready():
-	if not check_key_input:
-		set_process_unhandled_key_input(false)
-
 func widget():
 	return self
 
 func _ready():
+	dialog_bubble_tscn = load(dialog_bubble_scene)
+	choice_bubble_tscn = load(choice_bubble_scene)
+	action_bubble_tscn = load(action_bubble_scene)
+	if not check_key_input:
+		set_process_unhandled_key_input(false)
 	dialog_size = get_size()
 	dialog_position = get_position()
 	if dialog_id == "":
 		dialog_id = name
-		#print('dialog_id = '+dialog_id)
 
 func _process(delta):
 	if next_action_timer > 0:
@@ -152,7 +156,15 @@ func build_dialog(text, type='dialog'):
 	var inner_text_width = max_bubble_width - inner_bubble_margins
 	var line_spacing = 2 # todo: get from text label
 	# bubble background (ninepatchrect)
-	var dialog_bubble = dialog_bubble_tscn.instance()
+	var dialog_bubble
+	if type == 'dialog':
+		dialog_bubble = dialog_bubble_tscn.instance()
+	elif type == 'choice':
+		dialog_bubble = choice_bubble_tscn.instance()
+	elif type == 'action':
+		dialog_bubble = action_bubble_tscn.instance()
+	else:
+		dialog_bubble = dialog_bubble_tscn.instance()
 	var bubble = dialog_bubble.get_bubble()
 	var container = dialog_bubble.get_text_container()
 	var label = dialog_bubble.get_text_label()
@@ -430,6 +442,11 @@ func any_animating():
 		if child.animating:
 			return true
 	return false
+
+func finish_animating():
+	for child in get_children():
+		if child.animating:
+			child.finish_animating()
 
 func empty():
 	if get_child_count() > 0:

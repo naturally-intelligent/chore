@@ -53,6 +53,7 @@ onready var menus_root: Control = $Overlay/Menus
 signal scene_switch_complete()
 signal transition_finished()
 signal switch_transition_finished()
+signal scene_deleted(current_scene_name)
 
 func _ready():
 	current_scene = null
@@ -291,6 +292,8 @@ func _pre_delete_scenes(info):
 			current_scene.queue_free()
 			target_root.remove_child(current_scene)
 			current_scene = null
+			if switch_target == 'scene':
+				emit_signal("scene_deleted", current_scene_name)
 	# removal?
 	elif removal_method == 'delete_all':
 		var removal = []
@@ -299,6 +302,8 @@ func _pre_delete_scenes(info):
 			removal.append(child)
 		for child in removal:
 			target_root.remove_child(child)
+		if switch_target == 'scene':
+			emit_signal("scene_deleted", current_scene_name)
 
 # removing may not mean deleting, could be hiding
 func _remove_current_scene(info):
@@ -341,6 +346,8 @@ func _remove_current_scene(info):
 			current_scene.queue_free()
 			target_root.remove_child(current_scene)
 			current_scene = null
+			if switch_target == 'scene':
+				emit_signal("scene_deleted", current_scene_name)
 	if removal_method == 'hide':
 		if current_scene.has_method('on_hide'):
 			current_scene.on_hide()

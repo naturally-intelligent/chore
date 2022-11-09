@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "VBoxContainer",
+"class": "DialogWidget",
+"language": "GDScript",
+"path": "res://widgets/dialog.gd"
+}, {
 "base": "Camera2D",
 "class": "FeatureCamera2D",
 "language": "GDScript",
@@ -35,6 +40,7 @@ _global_script_classes=[ {
 "path": "res://engine/menu.gd"
 } ]
 _global_script_class_icons={
+"DialogWidget": "",
 "FeatureCamera2D": "",
 "Menu": "",
 "ParallaxPoint": "",
@@ -62,6 +68,13 @@ audio="*res://engine/audio.tscn"
 root="*res://engine/root.tscn"
 scenes="*res://engine/scenes.gd"
 menus="*res://engine/menus.gd"
+
+[debug]
+
+gdscript/warnings/unassigned_variable=false
+gdscript/warnings/unused_variable=false
+gdscript/warnings/unused_argument=false
+gdscript/warnings/return_value_discarded=false
 
 [display]
 

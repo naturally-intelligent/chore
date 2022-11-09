@@ -453,7 +453,7 @@ static func create_import_files_for_export(texture_dir):
 	for file in file_list:
 		if file.ends_with(".import"):
 			var file_name = file.replace(".import", "")
-			load(texture_dir + file_name)
+			return load(texture_dir + file_name)
 
 static func screenshot(scene, scale=false):
 	debug.print('Screenshot...')

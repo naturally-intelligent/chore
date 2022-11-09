@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://engine/root.gd" type="Script" id=1]
 [ext_resource path="res://art/hud/black-640x360.png" type="Texture" id=2]
@@ -9,7 +9,6 @@
 [ext_resource path="res://engine/shaders/brightness.shader" type="Shader" id=7]
 [ext_resource path="res://engine/shaders/screen-whirl.shader" type="Shader" id=8]
 [ext_resource path="res://engine/shaders/screen-mirage.shader" type="Shader" id=10]
-[ext_resource path="res://art/hud/mouse-arrow.png" type="Texture" id=16]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 8 )
@@ -218,7 +217,6 @@ __meta__ = {
 margin_right = 40.0
 margin_bottom = 40.0
 mouse_filter = 2
-texture = ExtResource( 16 )
 
 [node name="Transitions" type="Control" parent="Overlay"]
 pause_mode = 1

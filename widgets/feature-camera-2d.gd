@@ -54,7 +54,7 @@ func _ready():
 		limit_right = node.global_position.x
 	initial_camera_left_limit = limit_left
 	initial_camera_right_limit = limit_right
-	
+
 func _physics_process(delta):
 	if target:
 		if target_ahead:
@@ -72,7 +72,7 @@ func _physics_process(delta):
 			shoot_shake = max(shoot_shake - shoot_shake_decay * delta, 0)
 			do_shake(shoot_shake, shoot_shake_power)
 	last_camera_position = get_camera_position()
-		
+
 func do_shake(_shake, _shake_power):
 	var amount = pow(_shake, _shake_power)
 	noise_y += 1
@@ -86,23 +86,23 @@ func do_shake(_shake, _shake_power):
 #	rotation = max_roll * amount * rand_range(-1, 1)
 #	offset.x = max_offset.x * amount * rand_range(-1, 1)
 #	offset.y = max_offset.y * amount * rand_range(-1, 1)
-	
+
 func shake(amount):
 	quake = min(quake + amount, 1.0)
-	
-func shoot_shake(direction):
+
+func shooty_shake(_direction):
 	shoot_shake = 1
-	 
+
 func zoom_punch(wait=0.25, zoom_factor=0.5):
 	zoom_to(zoom_factor)
 	$PunchTimer.wait_time = wait
 	$PunchTimer.start()
-	
+
 func after_punch():
 	#zoom_normal()
 	var tween = $PunchTween
-	tween.interpolate_property(self, "zoom", 
-	  null, Vector2(1.0,1.0), 0.22, 
+	tween.interpolate_property(self, "zoom",
+	  null, Vector2(1.0,1.0), 0.22,
 	  Tween.TRANS_SINE, Tween.EASE_IN)
 	tween.start()
 	target = game.chip
@@ -112,9 +112,9 @@ func zoom_normal():
 	zoom.x = 1.0
 	zoom.y = 1.0
 
-func zoom_to(target):
-	zoom.x = target
-	zoom.y = target
+func zoom_to(_target):
+	zoom.x = _target
+	zoom.y = _target
 
 func zoom_in(amount):
 	var min_zoom = 0.5
@@ -136,12 +136,12 @@ func zoom_out(amount):
 	if zoom.y > max_zoom:
 		zoom.y = max_zoom
 	if zoom.y > 1.0:
-		limit_top = -640*(zoom.y-1.0)
+		limit_top = int(-640.0*(zoom.y-1.0))
 	else:
 		limit_top = 0
 	if target:
 		global_position = target.global_position
-		
+
 func look_ahead_camera():
 	var new_direction_x = sign(get_camera_position().x - last_camera_position.x)
 	if new_direction_x != 0 and new_direction_x != last_camera_direction_x:
@@ -149,7 +149,7 @@ func look_ahead_camera():
 		var look_offset_x = get_viewport_rect().size.x * look_ahead_factor * new_direction_x
 		var tween = $LookTween
 		tween.interpolate_property(self,
-			"position:x", offset.x, look_offset_x, 
+			"position:x", offset.x, look_offset_x,
 			look_ahead_time, look_ahead_trans, look_ahead_ease)
 		tween.start()
 
@@ -162,7 +162,7 @@ func target_ahead_camera_old():
 	var tween = $LookTween
 	if new_direction_x != 0 and new_direction_x != last_camera_direction_x:
 		tween.interpolate_property(self,
-			"global_position:x", null, target_pos.x, 
+			"global_position:x", null, target_pos.x,
 			look_ahead_time, look_ahead_trans, look_ahead_ease)
 		tween.start()
 	else:
@@ -170,45 +170,38 @@ func target_ahead_camera_old():
 			global_position = target_pos
 		else:
 			tween.interpolate_property(self,
-				"global_position", null, target_pos, 
+				"global_position", null, target_pos,
 				look_ahead_time*0.5, look_ahead_trans, look_ahead_ease)
 			tween.start()
 	last_camera_direction_x = new_direction_x
-		
+
 func target_ahead_camera():
 	var new_direction_x = sign(target.direction.x)
 	if new_direction_x == 0:
 		new_direction_x = last_camera_direction_x
-	
+
 	if new_direction_x != last_camera_direction_x:
 		$TargetAheadTimer.start()
 
-	var end_reached = false
-		
 	if $TargetAheadTimer.is_stopped():
-
 		if abs(target.velocity.x) > 0:
 			if new_direction_x > 0:
 				target_point.x += target_ahead_factor
 				if target_point.x > target_ahead_pixels:
 					target_point.x = target_ahead_pixels
-					end_reached = true
 			elif new_direction_x < 0:
 				target_point.x -= target_behind_factor
 				if target_point.x < -target_behind_pixels:
 					target_point.x = -target_behind_pixels
-					end_reached = true
-	
+
 	var tween = $LookTween
 	tween.interpolate_property(self,
-		"global_position", null, target.global_position + target_point, 
+		"global_position", null, target.global_position + target_point,
 		0.2, Tween.TRANS_SINE, Tween.EASE_OUT)
 	tween.start()
 
-	#global_position = target.global_position + target_point
-	
 	last_camera_direction_x = new_direction_x
-	
+
 func npc_punch(_target=null, wait=0.25, zoom_factor=0.5):
 	# todo: multitarget cam
 	if _target:
@@ -222,7 +215,7 @@ func set_camera_limits(left_x, right_x, top_y=false, bottom_y=false):
 	limit_right = right_x
 	if top_y: limit_top = top_y
 	if bottom_y: limit_bottom = bottom_y
-	
+
 func reset_camera_limits():
 	if smoothing_speed > 1:
 		set_smoothing_speed_temporarily()

@@ -118,9 +118,9 @@ func play_ambience_sound(name, total=1, origin=false, listener=false, time=0.33,
 	var timer = ambience_timers[name]
 	if timer.is_stopped():
 		if total == 1:
-			return play_sound(name, 1.0, origin, listener)
+			play_sound(name, 1.0, origin, listener)
 		else:
-			return play_random_sound(name, total, 1.0, origin, listener)
+			play_random_sound(name, total, 1.0, origin, listener)
 		if random:
 			time = math.random_float(time/2,time+time/2)
 		timer.start(time)
@@ -311,7 +311,8 @@ func stop_all_sounds():
 		sound.stop()
 		sound.playing = false
 	for looper in $SoundLoopers.get_children():
-		looper.disconnect("finished", self, "on_loop_sound")
+		if not dev.silence:
+			looper.disconnect("finished", self, "on_loop_sound")
 		looper.stop()
 		looper.playing = false
 	history = {}
