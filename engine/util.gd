@@ -132,7 +132,7 @@ static func random_direction(excluding=[]):
 	return random_array_excluding(dirs, excluding)
 
 static func random_left_right_up_vector(left_right_scale=1.0, up_scale=1.0):
-	var angle = math.random_float(0,PI)
+	var angle = math.random_float(PI,PI*2)
 	var v = Vector2(cos(angle), sin(angle))
 	v.x *= left_right_scale
 	v.y *= up_scale
