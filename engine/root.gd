@@ -1,7 +1,6 @@
 extends Control
 
-# CHORE ENGINE v0.6
-# Copyright (C) 2018-2022 Naturally Intelligent
+# CHORE ENGINE v1.1
 # Designed and developed by David Glen Kerr
 
 # root scene manager
