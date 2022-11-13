@@ -470,6 +470,7 @@ func check_is_root_scene(scene, scene_name, scene_type='scene'):
 		settings.allow_res_scenes = true # have to set this to load by filename
 		root_scene = true
 		scene.queue_free()
+		dev.launch_hacks()
 		if scene_type == 'scene':
 			scenes.fresh(scene_name)
 		else:
