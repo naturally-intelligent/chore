@@ -461,13 +461,20 @@ func clear_menus_above(menu):
 	for child in remove:
 		root.menus_root.remove_child(child)
 
-# for running from F6 within godot editor
-func check_is_root_scene(scene, scene_name):
-	if not root_scene:
+# F6 - for running from F6 key within godot editor
+#   to use, add a check to top of ready() function in any scene:
+#  	if not root.check_is_root_scene(self, filename):
+#		return
+func check_is_root_scene(scene, scene_name, scene_type='scene'):
+	if not root_scene and dev.dev_mode_enabled:
 		debug.print('F6 root scene override')
+		settings.allow_res_scenes = true # have to set this to load by filename
 		root_scene = true
 		scene.queue_free()
-		menus.show(scene_name)
+		if scene_type == 'scene':
+			scenes.fresh(scene_name)
+		else:
+			menus.fresh(scene_name)
 		return false
 	return true
 
