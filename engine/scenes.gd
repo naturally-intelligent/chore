@@ -1,7 +1,6 @@
 extends Node
 
 # CHORE ENGINE
-# Copyright (C) 2018-2022 Naturally Intelligent
 # Designed and developed by David Glen Kerr
 #
 # autoload 'scenes' and call the user functions
