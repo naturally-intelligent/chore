@@ -297,8 +297,8 @@ static func random_phone_number():
 # keys = values
 # keys = array # if split_commas and comma detected
 # values converted to ints/floats if convert_numbers, otherwise strings
-static func load_config(filename, split_commas=true, convert_numbers=true):
-	var path = filename
+static func load_config(_filename, split_commas=true, convert_numbers=true):
+	var path = _filename
 	var file = File.new()
 	var records = {}
 	var record = {}
@@ -356,8 +356,35 @@ static func load_config(filename, split_commas=true, convert_numbers=true):
 		if new_record and not added_record:
 			records[title] = record
 	else:
-		debug.print('ERROR: File missing: ', filename)
+		debug.print('ERROR: File missing: ', _filename)
 	return records
+
+static func save_config(_filename, config_data, header=false, convert_numbers=true):
+	var path = _filename
+	var file = File.new()
+	var records = {}
+	var record = {}
+	var title = ''
+	file.open(path, file.WRITE)
+	if file.is_open():
+		if header:
+			for section in header:
+				var section_data = header[section]
+				file.store_string('['+str(section)+']'+"\n")
+				for key in section_data:
+					var value = section_data[key]
+					file.store_string(str(key)+'='+str(value)+"\n")
+				file.store_string("\n")
+		for section in config_data:
+			var section_data = config_data[section]
+			file.store_string('['+str(section)+']'+"\n")
+			for key in section_data:
+				var value = section_data[key]
+				file.store_string(str(key)+'='+str(value)+"\n")
+			file.store_string("\n")
+		file.close()
+	else:
+		debug.print("ERROR: can't write config file ", _filename)
 
 # tries to convert a string to a number, if possible
 static func convert_string_to_number(value):
