@@ -57,12 +57,24 @@ var root_overlay_canvas_layer = 111
 # UI
 var root_capture_ui_cancel = true
 
+# DISPLAY
+var pixel_perfect := false
+var pixel_resolution = false # Vector2
+var scale_root_node := false
+var screenshot_size := Vector2(1920,1080)
+var screenshot_scale = false # Vector2
+var stretch_mode = false # SceneTree.STRETCH_MODE_VIEWPORT
+var stretch_aspect = false # SceneTree.STRETCH_ASPECT_KEEP
+var small_root_viewport := false
+var expanded_resolution = false # Vector2
+
 # MUSIC
 var music_ext = '.ogg'
 var music_dirs = ['music']
 var tracklist = {
 	'main-menu': ['song-file-todo', 0.8],
 }
+
 # SOUND
 var sound_ext = '.wav'
 var sound_dirs = ['sound']
@@ -71,6 +83,7 @@ var sound_alias = {
 	'menu-hover': 'bump',
 	'menu-press': 'pick',
 }
+
 # COLORS
 var color_rgbs = {
 	'red': Color(1,0,0),

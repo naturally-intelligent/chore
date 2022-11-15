@@ -491,7 +491,6 @@ static func screenshot(scene, scale=false):
 
 	# Retrieve the captured image
 	var img = scene.get_viewport().get_texture().get_data()
-	#print(img.get_class())
 	# scale after (note, doesn't upscale pixel-art nicely)
 	if scale:
 		img.resize(scale.x, scale.y, Image.INTERPOLATE_NEAREST)
@@ -499,7 +498,7 @@ static func screenshot(scene, scale=false):
 	# Flip it on the y-axis (because it's flipped)
 	img.flip_y()
 
-	# Linux: ~/.local/share/godot/app_userdata/Lemkin
+	# Linux: ~/.local/share/godot/app_userdata/project_name
 	var screens_subdir = "screenshots"
 	var dir = "user://" + screens_subdir
 	var directory = Directory.new()
@@ -588,3 +587,9 @@ static func signed_number(i: int) -> String:
 	elif i > 0:
 		return '+'+str(i)
 	return str(i)
+
+static func string_to_bool(s: String) -> bool:
+	if s.to_lower() == 'true':
+		return true
+	else:
+		return false

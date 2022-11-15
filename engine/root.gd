@@ -1,4 +1,4 @@
-extends Control
+extends Node
 
 # CHORE ENGINE v1.1
 # Designed and developed by David Glen Kerr
@@ -14,10 +14,6 @@ var last_scene_name := ''
 var switching_scene := false
 var root_scene := false
 var first_scene := true
-
-# screen
-var pixel_perfect := false
-var scale_window := false
 
 # current scene pointer (focus_scene)
 var current_scene: Node = null
@@ -38,6 +34,7 @@ var debug_lines := []
 var debug_max := 5
 var hud_allowed := true
 var has_quit := false
+var view_scale = Vector2(1,1)
 
 # scenes don't stack, they are a pool of persistent nodes
 #  only 1 is ever running
@@ -48,6 +45,16 @@ onready var scenes_root: Control = $Scenes
 #  more than one menu may be visible, and may be overlaid on top of the scenes
 var menu_container_style := 'stack'
 onready var menus_root: Control = $Overlay/Menus
+# overlay pointers
+onready var Overlay = $Overlay
+onready var OverlayHUD = $Overlay/HUD
+onready var Mouse = $Overlay/Mouse
+onready var Cursor = $Overlay/Mouse/Cursor
+onready var Transitions = $Overlay/Transitions
+onready var Shaders = $Overlay/Shaders
+onready var Debug = $Overlay/Debug
+# optional big screen node
+var big_screen_node = null
 
 signal scene_switch_complete()
 signal transition_finished()
@@ -55,35 +62,37 @@ signal switch_transition_finished()
 signal scene_deleted(current_scene_name)
 
 func _ready():
-	current_scene = null
-	seed(game.title.hash())
-	randomize()
-	$Overlay.layer = settings.root_overlay_canvas_layer
-	if settings.hide_system_cursor:
-		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	if pixel_perfect:
-		get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_VIEWPORT, SceneTree.STRETCH_ASPECT_IGNORE, Vector2(game.pixel_width,game.pixel_height))
+	# Special Display Modes
+	if settings.pixel_perfect:
+		get_tree().set_screen_stretch(settings.stretch_mode, settings.stretch_aspect, settings.pixel_resolution)
 		get_tree().connect("screen_resized", self, "pixel_perfect_resize")
 		pixel_perfect_resize()
-	else:
-		get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_VIEWPORT, SceneTree.STRETCH_ASPECT_KEEP, Vector2(game.pixel_width,game.pixel_height))
-		if scale_window:
-			scale_root()
+	elif settings.scale_root_node:
+		get_tree().set_screen_stretch(settings.stretch_mode, settings.stretch_aspect, settings.pixel_resolution)
+		scale_root()
+	elif settings.small_root_viewport:
+		setup_small_viewport(settings.expanded_resolution, settings.pixel_resolution)
+	# Transitions Setup
 	hide_transitions()
 	scale_transitions()
+	# Setup Mouse Cursor
+	if settings.hide_system_cursor:
+		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	if settings.custom_mouse_cursor:
 		set_cursor(settings.custom_mouse_cursor)
 	if settings.scale_mouse_cursor:
 		scale_cursor()
-	# dev timers
+	# Overlay Layer Number
+	Overlay.layer = settings.root_overlay_canvas_layer
+	# Timers
 	if not game.release:
 		$Timers/Screenshot.connect("timeout", self, "auto_screenshot")
 		if dev.autoscreenshot_timer:
 			$Timers/Screenshot.start() # use A key to start/stop
 		$Timers/Advance.connect("timeout", self, "stop_frame")
-	# POST LAUNCH
+	# Post-Launch
 	if dev.dev_mode_enabled:
-		dev.post_launch_hacks()
+		dev.call_deferred("post_launch_hacks")
 
 # called by menus.show()
 func switch_to_menu(menu, menu_name, menu_data=false, info={}, transitions={}):
@@ -509,18 +518,21 @@ func scale_root():
 	var proj_h = ProjectSettings.get_setting("display/window/size/height")
 	var scale_w = int(proj_w / orig_w)
 	var scale_h = int(proj_h / orig_h)
-	set_scale(Vector2(scale_w, scale_h))
+	view_scale = Vector2(scale_w, scale_h)
+	# you may want to scale other nodes after this, for example:
+	#  scenes_root.set_scale(view_scale)
+	#  menus_root.set_scale(view_scale)
 
 func scale_transitions():
 	if game.pixel_width > 640:
-		$Overlay/Transitions.rect_scale.x = game.pixel_width / 640
-		$Overlay/Transitions.rect_scale.y = game.pixel_height / 320
+		Transitions.rect_scale.x = game.pixel_width / 640
+		Transitions.rect_scale.y = game.pixel_height / 320
 
 func scale_cursor():
 	# if you use this, reimport mouse cursor texture with no filter
 	if game.pixel_width > settings.scale_mouse_cursor_w:
-		$Overlay/Mouse/Cursor.rect_scale.x = game.pixel_width / settings.scale_mouse_cursor_w
-		$Overlay/Mouse/Cursor.rect_scale.y = game.pixel_height / settings.scale_mouse_cursor_h
+		Cursor.rect_scale.x = game.pixel_width / settings.scale_mouse_cursor_w
+		Cursor.rect_scale.y = game.pixel_height / settings.scale_mouse_cursor_h
 
 # https://godotengine.org/qa/25504/pixel-perfect-scaling
 func pixel_perfect_resize():
@@ -556,8 +568,7 @@ func _input(event):
 		if Input.is_action_just_pressed("ui_fullscreen"):
 			util.fullscreen_flip()
 		if Input.is_action_just_pressed("ui_screenshot"):
-			util.screenshot(self, dev.screenshot_size)
-			#util.screenshot(self, Vector2(640,360))
+			util.screenshot(self, settings.screenshot_size)
 		if dev.dev_mode_enabled:
 			if Input.is_action_just_pressed("ui_hud"):
 				hud_allowed = not hud_allowed
@@ -611,7 +622,7 @@ func update_ui():
 	update_hud()
 
 func reset_overlay():
-	for node in $Overlay.get_children():
+	for node in Overlay.get_children():
 		node.visible = false
 
 # MOUSE / CURSOR
@@ -631,22 +642,21 @@ func update_mouse():
 
 func update_mouse_position():
 	var mouse_pos = get_viewport().get_mouse_position()
-	var root_scale = get_scale()
-	mouse_pos.x /= root_scale.x
-	mouse_pos.y /= root_scale.y
-	$Overlay/Mouse/Cursor.rect_position = mouse_pos
+	mouse_pos.x /= view_scale.x
+	mouse_pos.y /= view_scale.y
+	Cursor.rect_position = mouse_pos
 
 func set_cursor(file):
 	if util.file_exists(file):
 		var tex = load(file)
-		$Overlay/Mouse/Cursor.texture = tex
+		Cursor.texture = tex
 
 func show_cursor():
 	if settings.custom_mouse_cursor:
-		$Overlay/Mouse.visible = true
+		Mouse.visible = true
 
 func hide_cursor():
-	$Overlay/Mouse.visible = false
+	Mouse.visible = false
 	if dev.emulate_touch and dev.emulate_touch_mouse:
 		show_cursor()
 		mouse = true
@@ -665,36 +675,36 @@ func capture_mouse_cursor():
 
 func enable_shader(name):
 	hide_shaders()
-	$Overlay/Shaders.visible = true
+	Shaders.visible = true
 	if name == 'whirl':
-		$Overlay/Shaders/WhirlShader.visible = true
+		Shaders.get_node("WhirlShader").visible = true
 	elif name == 'mirage':
-		$Overlay/Shaders/MirageShader.visible = true
+		Shaders.get_node("MirageShader").visible = true
 	elif name == 'blur':
-		$Overlay/Shaders/BlurShader.visible = true
+		Shaders.get_node("BlurShader").visible = true
 	elif name == 'grey':
-		$Overlay/Shaders/GreyShader.visible = true
+		Shaders.get_node("GreyShader").visible = true
 	elif name == 'brightness':
-		$Overlay/Shaders/BrightnessShader.visible = true
+		Shaders.get_node("BrightnessShader").visible = true
 	#elif name == 'sepia':
-	#	$Overlay/Shaders/SepiaShader.visible = true
+	#	Shaders.get_node("SepiaShader").visible = true
 	#elif name == 'film':
-	#	$Overlay/Shaders/FilmShader.visible = true
+	#	Shaders.get_node("FilmShader").visible = true
 
 func hide_shaders():
-	$Overlay/Shaders.visible = false
-	for shader in $Overlay/Shaders.get_children():
+	Shaders.visible = false
+	for shader in Shaders.get_children():
 		shader.visible = false
 
 # TRANSITIONS
 
 func enable_transitions():
 	hide_transitions()
-	$Overlay/Transitions.visible = true
+	Transitions.visible = true
 
 func hide_transitions():
-	#$Overlay/Transitions.visible = false
-	for node in $Overlay/Transitions.get_children():
+	#Transitions.visible = false
+	for node in Transitions.get_children():
 		node.visible = false
 
 func _transition_out(transitions):
@@ -768,7 +778,7 @@ func transition_wait(middle_time=0.3):
 		emit_signal("transition_finished")
 		return
 	enable_transitions()
-	var transition = $Overlay/Transitions/Fader
+	var transition = Transitions.get_node("Fader")
 	transition.visible = true
 	# stay for a little while
 	var middle_timer = util.wait(game.time(middle_time), self)
@@ -780,9 +790,9 @@ func transition_fade_out(fade_time=0.3):
 		emit_signal("transition_finished")
 		return
 	enable_transitions()
-	var transition = $Overlay/Transitions/Fader
+	var transition = Transitions.get_node("Fader")
 	transition.visible = true
-	var tween = $Overlay/Transitions/Fader/Tween
+	var tween = Transitions.get_node("Fader/Tween")
 	tween.interpolate_property(transition, "modulate",
 	  Color(1, 1, 1, 0), Color(1, 1, 1, 1), game.time(fade_time),
 	  Tween.TRANS_LINEAR, Tween.EASE_IN)
@@ -796,9 +806,9 @@ func transition_fade_in(fade_time=0.3):
 		return
 	# fade in from black
 	enable_transitions()
-	var transition = $Overlay/Transitions/Fader
+	var transition = Transitions.get_node("Fader")
 	transition.visible = true
-	var tween = $Overlay/Transitions/Fader/Tween
+	var tween = Transitions.get_node("Fader/Tween")
 	tween.interpolate_property(transition, "modulate",
 	  Color(1, 1, 1, 1), Color(1, 1, 1, 0), game.time(fade_time),
 	  Tween.TRANS_LINEAR, Tween.EASE_IN)
@@ -815,7 +825,7 @@ func transition_fade_out_stagger(fade_out_time=0.2):
 	hide_cursor()
 	var fade_out_steps = 3
 	var fade_out_step_time = fade_out_time/float(fade_out_steps)
-	var transition = $Overlay/Transitions/Fader
+	var transition = Transitions.get_node("Fader")
 	transition.visible = true
 	for i in range(fade_out_steps+1):
 		var a = i/float(fade_out_steps)
@@ -832,7 +842,7 @@ func transition_fade_in_stagger(fade_in_time=0.3):
 	var fade_in_steps = 5
 	var fade_in_step_time = fade_in_time/float(fade_in_steps)
 	# fade out to black
-	var transition = $Overlay/Transitions/Fader
+	var transition = Transitions.get_node("Fader")
 	transition.visible = true
 	# fade back in from black to new scene
 	for i in range(fade_in_steps+1):
@@ -940,17 +950,17 @@ func transition_slide_both(old, new, direction, time=0.5):
 
 func black_box_slide():
 	enable_transitions()
-	$Overlay/Transitions.visible = true
+	Transitions.visible = true
 	hide_cursor()
 	var time = 1.5
-	var transition = $Overlay/Transitions/Box
-	var tween = $Overlay/Transitions/Box/Tween
+	var transition = Transitions.get_node("Box")
+	var tween = Transitions.get_node("Box/Tween")
 	var material = transition.get_material()
 	transition.visible = true
-	$Overlay/Transitions/Box/Top.visible = false
-	$Overlay/Transitions/Box/Bottom.visible = false
-	$Overlay/Transitions/Box/Right.visible = false
-	$Overlay/Transitions/Box/Left.visible = false
+	Transitions.get_node("Box/Top").visible = false
+	Transitions.get_node("Box/Bottom").visible = false
+	Transitions.get_node("Box/Right").visible = false
+	Transitions.get_node("Box/Left").visible = false
 	#tween.interpolate_property(material, "slide",
 	#  1.0, 0.0, fade_time,
 	#  Tween.TRANS_LINEAR, Tween.EASE_IN)
@@ -967,7 +977,7 @@ func black_box_slide():
 	update_ui()
 
 func set_box_slide(value):
-	var transition = $Overlay/Transitions/Box
+	var transition = Transitions.get_node("Box")
 	var material = transition.get_material()
 	material.set_shader_param("slide", value)
 
@@ -997,13 +1007,13 @@ func flip_autoscreenshot():
 # DEBUG / CONSOLE
 
 func update_debug():
-	$Overlay/Debug.visible = false
+	Debug.visible = false
 	if dev.debug_overlay:
-		$Overlay/Debug.visible = true
+		Debug.visible = true
 
 func set_debug_info(text):
-	$Overlay/Debug.visible = true
-	$Overlay/Debug/Info.set_text(text)
+	Debug.visible = true
+	Debug.get_node("Info").set_text(text)
 
 func add_debug_line(text):
 	# check for duplicate with last line
@@ -1012,23 +1022,23 @@ func add_debug_line(text):
 	debug_lines.append(text)
 	if debug_lines.size() > 5:
 		debug_lines.pop_front()
-	$Overlay/Debug.visible = true
+	Debug.visible = true
 	var full = ''
 	for line in debug_lines:
 		full += line + "\n"
-	$Overlay/Debug/Info.set_text(full)
+	Debug.get_node("Info").set_text(full)
 
 func show_console():
-	$Overlay/Debug.visible = true
+	Debug.visible = true
 
 func hide_console():
-	$Overlay/Debug.visible = false
+	Debug.visible = false
 
 func flip_console():
-	$Overlay/Debug.visible = not $Overlay/Debug.visible
+	Debug.visible = not Debug.visible
 
 func is_console_visible():
-	return $Overlay/Debug.visible
+	return Debug.visible
 
 func show_console_readme():
 	debug_lines = []
@@ -1072,47 +1082,98 @@ func update_hud():
 				allow_hud = false
 	if allow_hud:
 		show_hud()
-		for child in $Overlay/HUD.get_children():
+		for child in OverlayHUD.get_children():
 			if child.has_method('update_hud'):
 				child.update_hud()
 	else:
 		hide_hud()
 
 func show_hud():
-	$Overlay/HUD.visible = true
-	for child in $Overlay/HUD.get_children():
+	OverlayHUD.visible = true
+	for child in OverlayHUD.get_children():
 		child.visible = true
 
 func hide_hud():
-	$Overlay/HUD.visible = false
+	OverlayHUD.visible = false
 
 func is_hud_visible():
-	return $Overlay/HUD.visible
+	return OverlayHUD.visible
 
 func set_hud_text(text):
-	for child in $Overlay/HUD.get_children():
+	for child in OverlayHUD.get_children():
 		if child.has_method('set_text'):
 			child.set_text(text)
 
 func has_hud():
-	return $Overlay/HUD.get_child_count() > 0
+	return OverlayHUD.get_child_count() > 0
 
 func get_hud():
-	if $Overlay/HUD.get_child_count() > 0:
-		return $Overlay/HUD.get_children()[0]
+	if OverlayHUD.get_child_count() > 0:
+		return OverlayHUD.get_children()[0]
 	else:
 		return null
 
 func add_hud(hud):
-	for child in $Overlay/HUD.get_children():
+	for child in OverlayHUD.get_children():
 		if child == hud:
 			return false
-	$Overlay/HUD.add_child(hud)
+	OverlayHUD.add_child(hud)
 	return true
 
 func remove_hud():
-	for child in $Overlay/HUD.get_children():
+	for child in OverlayHUD.get_children():
 		child.queue_free()
+
+# SMALL VIEWPORT (Experimental)
+
+func setup_small_viewport(big_resolution=Vector2(1920,1080), small_resolution=Vector2(640,360)):
+	# create viewport scene to hold smaller game view
+	var gvc_tscn = load("res://widgets/game-viewport.tscn")
+	var game_viewport_container = gvc_tscn.instance()
+	# move to top of root node
+	add_child(game_viewport_container)
+	move_child(game_viewport_container, 0)
+	# get the new viewport
+	var game_viewport = game_viewport_container.viewport()
+	viewport = game_viewport
+	# move $Scenes and $Overlay to the new viewport
+	var _scenes = scenes_root
+	var _overlay = Overlay
+	remove_child(_scenes)
+	remove_child(_overlay)
+	game_viewport.add_child(_scenes)
+	game_viewport.add_child(_overlay)
+	_scenes = null
+	_overlay = null
+	# reassign scenes/menus containers
+	scenes_root = game_viewport.get_node("Scenes")
+	menus_root = game_viewport.get_node("Overlay/Menus")
+	# move other nodes to the new viewport
+	Overlay = game_viewport.get_node("Overlay")
+	OverlayHUD = game_viewport.get_node("Overlay/HUD")
+	Mouse = game_viewport.get_node("Overlay/Mouse")
+	Cursor = game_viewport.get_node("Overlay/Mouse/Cursor")
+	Transitions = game_viewport.get_node("Overlay/Transitions")
+	Shaders = game_viewport.get_node("Overlay/Shaders")
+	Debug = game_viewport.get_node("Overlay/Debug")
+	# resize the window
+	ProjectSettings.set_setting("display/window/size/width", big_resolution.x)
+	ProjectSettings.set_setting("display/window/size/height", big_resolution.y)
+	# set stretch to window size
+	get_tree().set_screen_stretch(settings.stretch_mode, \
+		settings.stretch_aspect, big_resolution)
+	# this is the new view_scale
+	view_scale = big_resolution / small_resolution
+	game_viewport_container.rect_scale = view_scale
+	# add a container for big overlaid scenes to end of root
+	#  root.shaders wont work on this node
+	if not big_screen_node:
+		big_screen_node = Control.new()
+		big_screen_node.name = "BigScreen"
+		add_child(big_screen_node)
+	# per-game setup
+	if game.has_method("high_resolution_mode"):
+		game.call_deferred("high_resolution_mode")
 
 # MISC
 

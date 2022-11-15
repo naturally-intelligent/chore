@@ -1,4 +1,5 @@
 extends Control
+class_name DialogBubble
 
 var animating = false
 var future_text = ''
@@ -14,12 +15,6 @@ func _ready():
 	$Bubble.set_h_size_flags(1)
 	if hover_sound:
 		audio.button_hover_sounds($Bubble/Backgrounds/ChoiceButton, hover_sound)
-
-func _process(delta):
-	#var s = get_minimum_size()
-	#set_custom_minimum_size(Vector2(0, s.y))
-	#set_custom_minimum_size(get_size())
-	pass
 
 func set_size_direct(dx, dy, text):
 	set_size(Vector2(dx, dy))
@@ -43,7 +38,6 @@ func set_text(text):
 		label.set_bbcode(text)
 	else:
 		label.set_text(text)
-
 
 func grow_animation(dx, dy, time, text):
 	if animating: return
@@ -134,3 +128,8 @@ func enable_button():
 	if button1: button1.disabled = false
 	var button2 = get_button("AdvanceButton")
 	if button2: button2.disabled = false
+
+func finish_animating():
+	# todo: allow user to force end of animation
+	# requires saving tween and dx/dy
+	pass

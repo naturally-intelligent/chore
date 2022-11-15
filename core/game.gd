@@ -59,6 +59,10 @@ var facts = {}
 
 var current_save_file = false
 
+func _init():
+	seed(title.hash())
+	randomize()
+
 func _ready():
 	on_new_game()
 	data_structure()
