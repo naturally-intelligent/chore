@@ -68,6 +68,10 @@ var stretch_aspect = false # SceneTree.STRETCH_ASPECT_KEEP
 var small_root_viewport := false
 var expanded_resolution = false # Vector2
 
+# CONFIG FILE
+var settings_config = {}
+var settings_config_file := "user://settings.cfg"
+
 # MUSIC
 var music_ext = '.ogg'
 var music_dirs = ['music']
@@ -96,3 +100,45 @@ var color_rgbs = {
 	'black': Color(0,0,0),
 }
 var colors = color_rgbs.keys()
+
+
+### CONFIG FILE
+
+func _init():
+	load_settings_config()
+	apply_settings_config(true)
+
+func load_settings_config():
+	if util.file_exists(settings_config_file):
+		settings_config = util.load_config(settings_config_file)
+
+func save_settings_config():
+	store_settings_values()
+	util.save_config(settings_config_file, settings_config)
+
+func apply_settings_config(first_launch=false):
+	if has_config('AUDIO', 'sound_volume'):
+		sound_volume = float(get_config('AUDIO', 'sound_volume'))
+	if has_config('AUDIO', 'music_volume'):
+		music_volume = float(get_config('AUDIO', 'music_volume'))
+
+func store_settings_values():
+	set_config('AUDIO', 'sound_volume', sound_volume)
+	set_config('AUDIO', 'music_volume', music_volume)
+
+func has_config(section, key):
+	if section in settings_config:
+		if key in settings_config[section]:
+			return true
+	return false
+
+func get_config(section, key):
+	if section in settings_config:
+		if key in settings_config[section]:
+			return settings_config[section][key]
+	return null
+
+func set_config(section, key, value):
+	if not section in settings_config:
+		settings_config[section] = {}
+	settings_config[section][key] = value

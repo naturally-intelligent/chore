@@ -43,8 +43,9 @@ func fullscreen_toggle(state):
 		OS.set_window_fullscreen(false)
 	var fullscreen = get_widget('fullscreen')
 	fullscreen.set_pressed(OS.is_window_fullscreen())
-	
+
 func back_button_pressed():
+	settings.save_settings_config()
 	menus.back()
 
 func sound_changed(value):
@@ -55,6 +56,6 @@ func music_changed(value):
 	settings.music_volume = value
 	audio.set_music_volume(settings.music_volume)
 
-func notify_fullscreen():	
+func notify_fullscreen():
 	var fullscreen = get_widget('fullscreen')
 	fullscreen.set_pressed(OS.is_window_fullscreen())

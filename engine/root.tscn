@@ -1,8 +1,6 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://engine/root.gd" type="Script" id=1]
-[ext_resource path="res://art/hud/black-640x360.png" type="Texture" id=2]
-[ext_resource path="res://art/cutscenes/cutscene-reference.png" type="Texture" id=3]
 [ext_resource path="res://art/cutscenes/cutscene-background.png" type="Texture" id=4]
 [ext_resource path="res://engine/shaders/blur-shader.shader" type="Shader" id=5]
 [ext_resource path="res://engine/shaders/greyscale-shader.shader" type="Shader" id=6]
@@ -167,7 +165,6 @@ __meta__ = {
 
 [node name="Letterbox" type="Control" parent="Overlay/Shaders"]
 pause_mode = 1
-visible = false
 margin_left = 53.0
 margin_top = 15.0
 margin_right = 93.0
@@ -175,31 +172,35 @@ margin_bottom = 55.0
 rect_scale = Vector2( 2, 2 )
 mouse_filter = 2
 
-[node name="Top" type="TextureRect" parent="Overlay/Shaders/Letterbox"]
+[node name="Top" type="ColorRect" parent="Overlay/Shaders/Letterbox"]
 margin_left = -53.0
 margin_top = -180.0
 margin_right = 267.0
 mouse_filter = 2
+color = Color( 0, 0, 0, 1 )
 
-[node name="Bottom" type="TextureRect" parent="Overlay/Shaders/Letterbox"]
+[node name="Bottom" type="ColorRect" parent="Overlay/Shaders/Letterbox"]
 margin_left = -54.0
 margin_top = 107.0
 margin_right = 266.0
 margin_bottom = 287.0
 mouse_filter = 2
+color = Color( 0, 0, 0, 1 )
 
-[node name="Right" type="TextureRect" parent="Overlay/Shaders/Letterbox"]
+[node name="Right" type="ColorRect" parent="Overlay/Shaders/Letterbox"]
 margin_left = 214.0
 margin_top = -14.0
 margin_right = 534.0
 margin_bottom = 166.0
 mouse_filter = 2
+color = Color( 0, 0, 0, 1 )
 
-[node name="Left" type="TextureRect" parent="Overlay/Shaders/Letterbox"]
+[node name="Left" type="ColorRect" parent="Overlay/Shaders/Letterbox"]
 margin_left = -320.0
 margin_top = -14.0
 margin_bottom = 166.0
 mouse_filter = 2
+color = Color( 0, 0, 0, 1 )
 
 [node name="Menus" type="Control" parent="Overlay"]
 pause_mode = 2
@@ -218,21 +219,16 @@ texture = ExtResource( 9 )
 
 [node name="Transitions" type="Control" parent="Overlay"]
 pause_mode = 1
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 
-[node name="Fader" type="TextureRect" parent="Overlay/Transitions"]
-visible = false
+[node name="Fader" type="ColorRect" parent="Overlay/Transitions"]
 modulate = Color( 0, 0, 0, 1 )
-margin_right = 320.0
-margin_bottom = 180.0
+anchor_right = 1.0
+anchor_bottom = 1.0
 mouse_filter = 2
-texture = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+color = Color( 0, 0, 0, 1 )
 
 [node name="Tween" type="Tween" parent="Overlay/Transitions/Fader"]
 
@@ -255,7 +251,6 @@ __meta__ = {
 anims/fade = SubResource( 10 )
 
 [node name="Box" type="TextureRect" parent="Overlay/Transitions"]
-visible = false
 material = SubResource( 7 )
 margin_left = 0.303333
 margin_top = -0.409818
@@ -266,50 +261,41 @@ texture = ExtResource( 4 )
 
 [node name="Tween" type="Tween" parent="Overlay/Transitions/Box"]
 
-[node name="cutscene-reference" type="TextureRect" parent="Overlay/Transitions/Box"]
-visible = false
-margin_left = -0.303333
-margin_top = 1.40982
-margin_right = 319.697
-margin_bottom = 181.41
-mouse_filter = 2
-texture = ExtResource( 3 )
-
-[node name="Top" type="TextureRect" parent="Overlay/Transitions/Box"]
+[node name="Top" type="ColorRect" parent="Overlay/Transitions/Box"]
 use_parent_material = true
 margin_left = -0.303333
 margin_top = -164.59
 margin_right = 319.697
 margin_bottom = 15.4098
 mouse_filter = 2
-texture = ExtResource( 4 )
+color = Color( 0, 0, 0, 1 )
 
-[node name="Bottom" type="TextureRect" parent="Overlay/Transitions/Box"]
+[node name="Bottom" type="ColorRect" parent="Overlay/Transitions/Box"]
 use_parent_material = true
 margin_left = -1.30333
 margin_top = 122.41
 margin_right = 318.697
 margin_bottom = 302.41
 mouse_filter = 2
-texture = ExtResource( 4 )
+color = Color( 0, 0, 0, 1 )
 
-[node name="Right" type="TextureRect" parent="Overlay/Transitions/Box"]
+[node name="Right" type="ColorRect" parent="Overlay/Transitions/Box"]
 use_parent_material = true
 margin_left = 266.697
 margin_top = 1.40982
 margin_right = 586.697
 margin_bottom = 181.41
 mouse_filter = 2
-texture = ExtResource( 4 )
+color = Color( 0, 0, 0, 1 )
 
-[node name="Left" type="TextureRect" parent="Overlay/Transitions/Box"]
+[node name="Left" type="ColorRect" parent="Overlay/Transitions/Box"]
 use_parent_material = true
 margin_left = -267.303
 margin_top = 1.40982
 margin_right = 52.6967
 margin_bottom = 181.41
 mouse_filter = 2
-texture = ExtResource( 4 )
+color = Color( 0, 0, 0, 1 )
 
 [node name="Debug" type="Control" parent="Overlay"]
 visible = false

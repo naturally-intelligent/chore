@@ -223,6 +223,9 @@ static func thousands_sep(number, prefix=''):
 	else: res = prefix+res
 	return res
 
+static func percent_string(f: float) -> String:
+	return str(int(f*100)) + '%'
+
 static func file_exists(file):
 	return File.new().file_exists(file)
 
@@ -367,20 +370,25 @@ static func save_config(_filename, config_data, header=false, convert_numbers=tr
 	var title = ''
 	file.open(path, file.WRITE)
 	if file.is_open():
+		# HEADER SECTION
 		if header:
 			for section in header:
 				var section_data = header[section]
 				file.store_string('['+str(section)+']'+"\n")
 				for key in section_data:
 					var value = section_data[key]
-					file.store_string(str(key)+'='+str(value)+"\n")
+					file.store_string(str(key)+"\t = "+str(value)+"\n")
 				file.store_string("\n")
+		# MAIN SECTION
 		for section in config_data:
 			var section_data = config_data[section]
 			file.store_string('['+str(section)+']'+"\n")
 			for key in section_data:
 				var value = section_data[key]
-				file.store_string(str(key)+'='+str(value)+"\n")
+				var tabs = 3 - key.length()/4
+				if tabs < 0: tabs = 0
+				var tabs_str = "\t".repeat(tabs)
+				file.store_string(str(key)+tabs_str+ " = "+str(value)+"\n")
 			file.store_string("\n")
 		file.close()
 	else:
@@ -482,21 +490,38 @@ static func create_import_files_for_export(texture_dir):
 			var file_name = file.replace(".import", "")
 			return load(texture_dir + file_name)
 
-static func screenshot(scene, scale=false):
+# SCREENSHOT (F5)
+static func screenshot(scene, scale=false, logo=false):
 	debug.print('Screenshot...')
 	scene.get_viewport().set_clear_mode(Viewport.CLEAR_MODE_ONLY_NEXT_FRAME)
+
+	# hide cursor?
+	var show_cursor = root.is_cursor_visible()
+	if show_cursor:
+		root.hide_cursor()
+
 	# Let two frames pass to make sure the screen was captured
 	yield(scene.get_tree(), "idle_frame")
 	yield(scene.get_tree(), "idle_frame")
 
 	# Retrieve the captured image
-	var img = scene.get_viewport().get_texture().get_data()
+	var img: Image = scene.get_viewport().get_texture().get_data()
+
 	# scale after (note, doesn't upscale pixel-art nicely)
 	if scale:
 		img.resize(scale.x, scale.y, Image.INTERPOLATE_NEAREST)
 
 	# Flip it on the y-axis (because it's flipped)
 	img.flip_y()
+
+	# optional logo (filename like "res://art/logo.png")
+	if logo:
+		if util.file_exists(logo):
+			var logo_img: Image = Image.new()
+			logo_img.load(logo)
+			var logo_rect = Rect2(0,0, settings.screenshot_size.x, settings.screenshot_size.y)
+			logo_img.convert(img.get_format())
+			img.blend_rect(logo_img, logo_rect, Vector2(0,0))
 
 	# Linux: ~/.local/share/godot/app_userdata/project_name
 	var screens_subdir = "screenshots"
@@ -506,21 +531,29 @@ static func screenshot(scene, scale=false):
 		directory.open("user://")
 		directory.make_dir(screens_subdir)
 
+	# Screenshot File Name
 	var project_name = ProjectSettings.get_setting('application/config/name').replace(' ','')
 	var count = 1
-	var file = project_name + "-%03d.png" % count
-	var file_dir = dir + '/' + file
+	var file_name = project_name + "-%03d.png" % count
+	var file_dir = dir + '/' + file_name
 	var fileTool = File.new()
 	while(fileTool.file_exists(file_dir)):
 		count = count + 1
-		file = project_name + "-%03d.png" % count
-		file_dir = dir + '/' + file
-	debug.print('Saving: '+file+'...')
+		file_name = project_name + "-%03d.png" % count
+		file_dir = dir + '/' + file_name
+	debug.print('Saving '+file_name+'...')
+	var dir_plus_file = OS.get_user_data_dir() + util.dir_sep() + file_name
+
+	# Final Save as PNG
 	img.save_png(file_dir)
 
-	print('Save Location: ', OS.get_user_data_dir())
+	print('Saved to : ', dir_plus_file)
 
-	return file
+	# restore cursor?
+	if show_cursor:
+		root.show_cursor()
+
+	return file_name
 
 # https://godotengine.org/qa/5175/how-to-get-all-the-files-inside-a-folder
 static func list_files_in_directory(path):
@@ -539,6 +572,13 @@ static func list_files_in_directory(path):
 	dir.list_dir_end()
 
 	return files
+
+# directory separator
+static func dir_sep():
+	if util.windows:
+		return '\\'
+	else:
+		return '/'
 
 static func strip_bbcode(text):
 	var regex = RegEx.new()
@@ -593,3 +633,89 @@ static func string_to_bool(s: String) -> bool:
 		return true
 	else:
 		return false
+
+static func keycode_to_scancode(key_code):
+	var scan_code = OS.find_scancode_from_string(key_code) # ex: Escape
+	if not scan_code:
+		scan_code = OS.find_scancode_from_string(key_code.substr(4)) # ex: KEY_ESCAPE
+	if not scan_code:
+		debug.print("Can't find scancode for ",key_code)
+	return scan_code
+
+### INPUT MAPPING
+# from previously loaded config file, ex:
+# [INPUT]
+# KEY_A = ui_left
+# KEY_D = ui_right
+# KEY_LEFT = ui_left
+# KEY_RIGHT = ui_right
+# KEY_SPACE = ui_jump
+static func map_input_keys(config, allowed:=[]):
+	var to_map = []
+	var cleared = []
+	# Check for validity of input maps, and erase any existing conflicts
+	for key_code in config:
+		var ui_action = config[key_code]
+		var allow = (not allowed) or ('all' in allowed) or (ui_action in allowed)
+		if allow:
+			var scan_code = keycode_to_scancode(key_code)
+			#debug.print('Input Map Request: ', ui_action, key_code, scan_code)
+			if scan_code:
+				# Check if already mapped
+				var duplicate = false
+				var input_events = InputMap.get_action_list(ui_action)
+				for input_event in input_events:
+					if input_event is InputEventKey:
+						if scan_code == input_event.scancode:
+							duplicate = true
+				# Erase if new
+				if not duplicate:
+					for input_event in input_events:
+						if input_event is InputEventKey:
+							debug.print('Erasing Key:', ui_action, '<-', OS.get_scancode_string(input_event.scancode))
+							InputMap.action_erase_event(ui_action, input_event)
+					to_map.append(ui_action)
+	# Now assign keys (this allows multiple keys per action)
+	for key_code in config:
+		var ui_action = config[key_code]
+		if ui_action in to_map:
+			debug.print('Input Map:', key_code, '-> to ->', ui_action)
+			var scan_code = keycode_to_scancode(key_code)
+			if scan_code:
+				var new_event = InputEventKey.new()
+				new_event.set_scancode(scan_code)
+				InputMap.action_add_event(ui_action, new_event)
+
+# CONFIG GAMEPADS
+# from previously loaded config file, ex:
+# [GAMEPAD_0]
+# Button_0=ui_jump
+# Button_2=ui_jump
+# Button_1=ui_shoot
+# Button_3=ui_flashlight
+static func map_gamepad_input(config):
+	for device_id in range(0,8+1):
+		var device_section = 'GAMEPAD_'+str(device_id)
+		if device_section in config:
+			debug.print("Loading input map for GAMEPAD", str(device_id))
+			# Erase buttons
+			for button in config[device_section]:
+				var ui_action = config[device_section][button]
+				var button_index = int(button.substr(9))
+				var input_events = InputMap.get_action_list(ui_action)
+				for input_event in input_events:
+					if input_event is InputEventJoypadButton:
+						if input_event.device == device_id:
+							debug.print("- Erasing Button:", ui_action, '<- button', str(input_event.button_index))
+							InputMap.action_erase_event(ui_action, input_event)
+			# Map buttons
+			for button in config[device_section]:
+				var ui_action = config[device_section][button]
+				var button_index = int(button.substr(7)) # Ex: Button_3
+				debug.print("- Mapping Button: button", str(button_index), '-> to ->', ui_action)
+				var new_event = InputEventJoypadButton.new()
+				new_event.device = device_id
+				new_event.set_button_index(button_index)
+				InputMap.action_add_event(ui_action, new_event)
+		else:
+			return

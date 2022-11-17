@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Control",
+"class": "DialogBubble",
+"language": "GDScript",
+"path": "res://widgets/dialog-bubble.gd"
+}, {
 "base": "VBoxContainer",
 "class": "DialogWidget",
 "language": "GDScript",
@@ -45,6 +50,7 @@ _global_script_classes=[ {
 "path": "res://engine/menu.gd"
 } ]
 _global_script_class_icons={
+"DialogBubble": "",
 "DialogWidget": "",
 "FeatureCamera2D": "",
 "GameViewport": "",
@@ -72,12 +78,11 @@ game="*res://core/game.gd"
 dev="*res://core/dev.gd"
 audio="*res://engine/audio.tscn"
 root="*res://engine/root.tscn"
-menus="*res://engine/menus.gd"
 scenes="*res://engine/scenes.gd"
+menus="*res://engine/menus.gd"
 
 [debug]
 
-gdscript/warnings/unassigned_variable=false
 gdscript/warnings/unused_variable=false
 gdscript/warnings/unused_argument=false
 gdscript/warnings/return_value_discarded=false
@@ -135,6 +140,14 @@ dev_fast={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":93,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
+}
+ui_hud={
+"deadzone": 0.5,
+"events": [  ]
+}
+ui_autoscreenshot={
+"deadzone": 0.5,
+"events": [  ]
 }
 
 [physics]

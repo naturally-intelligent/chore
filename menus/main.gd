@@ -14,13 +14,13 @@ func _ready():
 		audio.button_sounds(button, 'menu-hover', 'menu-press')
 	game.massage_label($Copyright)
 	game.massage_label($Version)
-	set_default_menu_button($Buttons/Play)
-	
+	default_menu_button = $Buttons/Play
+
 	audio.play_music('main-menu')
-	
+
 	# VERSION
 	$Version.set_text('v' + game.version)
-		
+
 func on_play_pressed():
 	if not scenes.reveal():
 		scenes.show('play', 'fade')
@@ -36,7 +36,7 @@ func on_settings_pressed():
 
 func on_about_pressed():
 	menus.show('credits')
-	
+
 func on_quit_pressed():
 	audio.delayed_sound('quit', 0.2)
 	root.fade_out_and_quit()

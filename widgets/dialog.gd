@@ -241,12 +241,12 @@ func create_dialog(text, type='dialog'):
 	var bubble_data = build_dialog(text, type)
 	var bubble = bubble_data[0]
 	if bubble:
-		var bubble_width = bubble_data[1]
-		var bubble_height = bubble_data[2]
-		var bubble_grow_time = bubble_data[3]
-		var formatted_text = bubble_data[4]
+		var _bubble_width = bubble_data[1]
+		var _bubble_height = bubble_data[2]
+		var _bubble_grow_time = bubble_data[3]
+		var _formatted_text = bubble_data[4]
 		add_child(bubble)
-		bubble.grow_animation(bubble_width, bubble_height, bubble_grow_time, formatted_text)
+		bubble.grow_animation(_bubble_width, _bubble_height, _bubble_grow_time, _formatted_text)
 		if auto_remove:	auto_remove_timers[bubble.get_name()] = auto_remove_speed
 		#queue_sort() #https://godotdevelopers.org/forum/discussion/18760/create-scroll-on-vboxcontainer
 
@@ -254,12 +254,12 @@ func create_action(text):
 	var bubble_data = build_dialog(text, 'action')
 	var bubble = bubble_data[0]
 	if bubble:
-		var bubble_width = bubble_data[1]
-		var bubble_height = bubble_data[2]
-		var bubble_grow_time = bubble_data[3]
-		var formatted_text = bubble_data[4]
+		var _bubble_width = bubble_data[1]
+		var _bubble_height = bubble_data[2]
+		var _bubble_grow_time = bubble_data[3]
+		var _formatted_text = bubble_data[4]
 		add_child(bubble)
-		bubble.grow_animation(bubble_width, bubble_height, bubble_grow_time, formatted_text)
+		bubble.grow_animation(_bubble_width, _bubble_height, _bubble_grow_time, _formatted_text)
 		if auto_remove:	auto_remove_timers[bubble.get_name()] = auto_remove_speed
 		auto_remove_bubbles()
 
@@ -267,20 +267,20 @@ func create_player(text):
 	var bubble_data = build_dialog(text, 'player')
 	var bubble = bubble_data[0]
 	if bubble:
-		var bubble_width = bubble_data[1]
-		var bubble_height = bubble_data[2]
-		var bubble_grow_time = bubble_data[3]
-		var formatted_text = bubble_data[4]
+		var _bubble_width = bubble_data[1]
+		var _bubble_height = bubble_data[2]
+		var _bubble_grow_time = bubble_data[3]
+		var _formatted_text = bubble_data[4]
 		if align_choices == 'right':
 			var hbox = HBoxContainer.new()
 			hbox.set_alignment(BoxContainer.ALIGN_END)
 			hbox.add_child(bubble)
 			add_child(hbox)
-			bubble.grow_animation(bubble_width, bubble_height, bubble_grow_time, formatted_text)
+			bubble.grow_animation(_bubble_width, _bubble_height, _bubble_grow_time, _formatted_text)
 			if auto_remove:	auto_remove_timers[hbox.get_name()] = auto_remove_speed
 		elif align_choices == 'left':
 			add_child(bubble)
-			bubble.grow_animation(bubble_width, bubble_height, bubble_grow_time, formatted_text)
+			bubble.grow_animation(_bubble_width, _bubble_height, _bubble_grow_time, _formatted_text)
 			if auto_remove:	auto_remove_timers[bubble.get_name()] = auto_remove_speed
 		auto_remove_bubbles()
 
@@ -289,16 +289,16 @@ func create_choice(text, marker, object=null):
 	var bubble_data = build_dialog(text, 'choice')
 	var bubble = bubble_data[0]
 	if bubble:
-		var bubble_width = bubble_data[1]
-		var bubble_height = bubble_data[2]
-		var bubble_grow_time = bubble_data[3]
-		var formatted_text = bubble_data[4]
+		var _bubble_width = bubble_data[1]
+		var _bubble_height = bubble_data[2]
+		var _bubble_grow_time = bubble_data[3]
+		var _formatted_text = bubble_data[4]
 		if object:
 			var button = bubble.get_choice_button()
 			button.connect("pressed", object, "on_choice_press", [dialog_id, marker, text])
 		#bubble.set_custom_minimum_size(Vector2(dialog_size.x, 1))
 		add_child(bubble)
-		bubble.grow_animation(bubble_width, bubble_height, bubble_grow_time, formatted_text)
+		bubble.grow_animation(_bubble_width, _bubble_height, _bubble_grow_time, _formatted_text)
 		if auto_remove:	auto_remove_timers[bubble.get_name()] = auto_remove_speed
 		auto_remove_bubbles()
 		next_action_timer = next_action_delay

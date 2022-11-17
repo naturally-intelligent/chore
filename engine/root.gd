@@ -287,7 +287,9 @@ func _add_next_scene(scene, scene_name, info):
 			target_root.add_child(_next_scene)
 
 func _pre_delete_scenes(info):
+	var switch_origin = info['switch_origin']
 	var switch_target = info['switch_target']
+	var origin_root = get_scene_container(switch_origin)
 	var target_root = get_scene_container(switch_target)
 	var removal_method = 'hide'
 	if 'remove' in info:
@@ -298,7 +300,7 @@ func _pre_delete_scenes(info):
 	if removal_method == 'delete':
 		if current_scene:
 			current_scene.queue_free()
-			target_root.remove_child(current_scene)
+			origin_root.remove_child(current_scene)
 			current_scene = null
 			if switch_target == 'scene':
 				emit_signal("scene_deleted", current_scene_name)
@@ -568,7 +570,10 @@ func _input(event):
 		if Input.is_action_just_pressed("ui_fullscreen"):
 			util.fullscreen_flip()
 		if Input.is_action_just_pressed("ui_screenshot"):
-			util.screenshot(self, settings.screenshot_size)
+			if game.has_method("screenshot"):
+				game.screenshot()
+			else:
+				util.screenshot(self, settings.screenshot_size)
 		if dev.dev_mode_enabled:
 			if Input.is_action_just_pressed("ui_hud"):
 				hud_allowed = not hud_allowed
@@ -650,6 +655,9 @@ func set_cursor(file):
 	if util.file_exists(file):
 		var tex = load(file)
 		Cursor.texture = tex
+
+func is_cursor_visible():
+	return Mouse.visible
 
 func show_cursor():
 	if settings.custom_mouse_cursor:
@@ -1030,12 +1038,17 @@ func add_debug_line(text):
 
 func show_console():
 	Debug.visible = true
+	#print_tree_pretty()
+	#print_stray_nodes()
 
 func hide_console():
 	Debug.visible = false
 
 func flip_console():
-	Debug.visible = not Debug.visible
+	if not Debug.visible:
+		show_console()
+	else:
+		hide_console()
 
 func is_console_visible():
 	return Debug.visible
