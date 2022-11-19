@@ -556,8 +556,11 @@ static func screenshot(scene, scale=false, logo=false):
 	return file_name
 
 # https://godotengine.org/qa/5175/how-to-get-all-the-files-inside-a-folder
-static func list_files_in_directory(path):
+# - sort_by = date
+# - sort_order = newest/oldest
+static func list_files_in_directory(path, sort_by=false, sort_order=false):
 	var files = []
+	var sort = []
 	var dir = Directory.new()
 	dir.open(path)
 	dir.list_dir_begin(true, true)
@@ -568,8 +571,25 @@ static func list_files_in_directory(path):
 			break
 		elif not file.begins_with("."):
 			files.append(file)
-
+			# collect sort info if needed
+			if sort_by:
+				if sort_by == 'date':
+					var modified_time = File.new().get_modified_time(file)
+					sort.append([file, modified_time])
 	dir.list_dir_end()
+
+	# sort?
+	if sort_by and sort_by == 'date':
+		if sort_order == 'newest':
+			sort.sort_custom(util.FirstElementGreatest, "sort")
+			files = []
+			for data in sort:
+				files.append(data[0])
+		elif sort_order == 'oldest':
+			sort.sort_custom(util.FirstElementLeast, "sort")
+			files = []
+			for data in sort:
+				files.append(data[0])
 
 	return files
 
