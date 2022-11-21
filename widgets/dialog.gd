@@ -2,7 +2,7 @@ extends VBoxContainer
 class_name DialogWidget
 
 # a Dialog container
-# Copyright (C) 2018 Naturally Intelligent
+# Chore Engine
 
 # BUBBLE STYLE
 enum BubbleStyle {

@@ -1,6 +1,6 @@
 extends "res://menus/menu.gd"
 
-# Copyright (C) 2018 Naturally Intelligent
+# Chore Engine
 
 var text_entry = true
 var no_back_button = true
