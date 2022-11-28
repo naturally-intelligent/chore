@@ -624,6 +624,21 @@ static func opposite_direction(direction: String) -> String:
 		return 'left'
 	return 'none'
 
+# TILES
+
+static func tilemap_closest_used_cell(map: TileMap, position: Vector2):
+	var desired_cell = map.world_to_map(position)
+	if map.get_cell(desired_cell.x, desired_cell.y) == TileMap.INVALID_CELL:
+		var closest_cell = false
+		var closest_distance = 100000
+		for cell in map.get_used_cells():
+			var distance = desired_cell.distance_to(cell)
+			if distance < closest_distance:
+				closest_cell = cell
+				closest_distance = distance
+		return closest_cell
+	return desired_cell
+
 # STRING CONVENIENCE
 
 static func s(i: int) -> String:
