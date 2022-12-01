@@ -7,8 +7,6 @@ extends Node
 #  loads and swaps scenes with transitions
 #  avoid using directly, use 'menus' global object
 
-onready var viewport: Viewport = get_viewport()
-
 # scene info
 var last_scene_name := ''
 var switching_scene := false
@@ -538,6 +536,7 @@ func scale_cursor():
 
 # https://godotengine.org/qa/25504/pixel-perfect-scaling
 func pixel_perfect_resize():
+	var viewport: Viewport = get_viewport()
 	var window_size = OS.get_window_size()
 
 	# see how big the window is compared to the viewport size
@@ -615,6 +614,12 @@ func _input(event):
 				flip_console()
 				if is_console_visible():
 					show_console_readme()
+			elif Input.is_action_just_pressed("dev_info_prev"):
+				debug_info_prev()
+			elif Input.is_action_just_pressed("dev_info_next"):
+				debug_info_next()
+			elif Input.is_action_just_pressed("dev_info_point"):
+				debug_info_point()
 
 # UPDATES
 
@@ -1034,7 +1039,7 @@ func add_debug_line(text):
 	var full = ''
 	for line in debug_lines:
 		full += line + "\n"
-	Debug.get_node("Info").set_text(full)
+	Debug.set_info_text(full)
 
 func show_console():
 	Debug.visible = true
@@ -1077,6 +1082,30 @@ func debug_scene_roots():
 		count += 1
 	debug.print('current_scene_name = ' + current_scene_name)
 	debug.print('current_scene_type = ' + current_scene_type)
+
+func debug_info_next():
+	if game.has_method('debug_info_next'):
+		game.debug_info_next()
+
+func debug_info_prev():
+	if game.has_method('debug_info_prev'):
+		game.debug_info_prev()
+
+func debug_info_point():
+	if game.has_method('debug_info_point'):
+		game.debug_info_point(Cursor.rect_position, 16)
+
+func add_debug_info_node(node: Node):
+	Debug.add_info_node(node)
+
+func remove_debug_info_node(node: Node):
+	Debug.remove_info_node(node)
+
+func next_debug_info(container: Node):
+	Debug.next_debug_info(container)
+
+func prev_debug_info(container: Node):
+	Debug.prev_debug_info(container)
 
 # HUD
 # - an empty node that you can add scenes to with some convenience methods
@@ -1140,6 +1169,7 @@ func remove_hud():
 # SMALL VIEWPORT (Experimental)
 
 func setup_small_viewport(big_resolution=Vector2(1920,1080), small_resolution=Vector2(640,360)):
+	var viewport: Viewport = get_viewport()
 	# create viewport scene to hold smaller game view
 	var gvc_tscn = load("res://widgets/game-viewport.tscn")
 	var game_viewport_container = gvc_tscn.instance()

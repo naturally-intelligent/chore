@@ -1,6 +1,7 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://engine/root.gd" type="Script" id=1]
+[ext_resource path="res://engine/overlay.tscn" type="PackedScene" id=2]
 [ext_resource path="res://art/cutscenes/cutscene-background.png" type="Texture" id=4]
 [ext_resource path="res://engine/shaders/blur-shader.shader" type="Shader" id=5]
 [ext_resource path="res://engine/shaders/greyscale-shader.shader" type="Shader" id=6]
@@ -297,45 +298,8 @@ margin_bottom = 181.41
 mouse_filter = 2
 color = Color( 0, 0, 0, 1 )
 
-[node name="Debug" type="Control" parent="Overlay"]
+[node name="Debug" parent="Overlay" instance=ExtResource( 2 )]
 visible = false
-margin_left = 5.72081
-margin_top = 4.61069
-margin_right = 45.7198
-margin_bottom = 44.6107
-mouse_filter = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Title" type="Label" parent="Overlay/Debug"]
-margin_right = 189.0
-margin_bottom = 23.0
-text = "ROOT - Debug Overlay"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Info" type="Label" parent="Overlay/Debug"]
-margin_left = 4.0
-margin_top = 18.0
-margin_right = 362.0
-margin_bottom = 138.0
-custom_constants/line_spacing = 1
-text = "variable 1 = value
-variable 2 = value
-variable 3 = value"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ColorRect" type="ColorRect" parent="Overlay/Debug"]
-margin_left = -1.72081
-margin_top = -1.61069
-margin_right = 168.279
-margin_bottom = 92.3893
-mouse_filter = 1
-color = Color( 0.317647, 0.317647, 0.317647, 0.164706 )
 
 [node name="Timers" type="Node" parent="."]
 

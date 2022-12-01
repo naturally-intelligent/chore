@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://engine/overlay.gd" type="Script" id=1]
+
+[node name="DebugOverlay" type="Control"]
+margin_left = 5.72081
+margin_top = 4.61069
+margin_right = 45.7198
+margin_bottom = 44.6107
+mouse_filter = 2
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="."]
+margin_right = 189.0
+margin_bottom = 23.0
+text = "ROOT - Debug Overlay"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Info" type="Label" parent="."]
+margin_left = 4.0
+margin_top = 18.0
+margin_right = 362.0
+margin_bottom = 138.0
+custom_constants/line_spacing = 1
+text = "variable 1 = value
+variable 2 = value
+variable 3 = value"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = -1.72081
+margin_top = -1.61069
+margin_right = 168.279
+margin_bottom = 92.3893
+mouse_filter = 1
+color = Color( 0.317647, 0.317647, 0.317647, 0.164706 )
