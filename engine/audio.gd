@@ -7,6 +7,8 @@ var ambience_timers := {}
 var file_locations := {}
 var current_song = false
 var missing_files := []
+var paused_sounds := {}
+var music_position = false
 
 signal music_volume_changed()
 
@@ -65,8 +67,18 @@ func music_playing(song):
 		return true
 	return false
 
+func pause_music():
+	music_position = $MusicPlayer.get_playback_position()
+	$MusicPlayer.stop()
+
+func resume_music():
+	$MusicPlayer.play()
+	if music_position:
+		$MusicPlayer.seek(music_position)
+
 func stop_music():
 	$MusicPlayer.stop()
+	music_position = false
 	current_song = false
 
 func stop_and_reset_music():
@@ -146,6 +158,7 @@ func queue_sound(file_name, volume=1.0, allow_multiple=true):
 		player.play()
 		player.pitch_scale = 1.0
 		history[player.name] = file_name
+		paused_sounds.erase(player)
 		return player
 
 func stop_sound(name):
@@ -159,18 +172,21 @@ func stop_sound(name):
 					player.playing = false
 					#player.set_stream(null)
 					history.erase(player.name)
+					paused_sounds.erase(player)
 				elif history[player.name] == name:
 					player.stream_paused = true
 					player.stop()
 					player.playing = false
 					#player.set_stream(null)
 					history.erase(player.name)
+					paused_sounds.erase(player)
 				elif player.name == name:
 					player.stream_paused = true
 					player.stop()
 					player.playing = false
 					#player.set_stream(null)
 					history.erase(player.name)
+					paused_sounds.erase(player)
 	for player in $SoundLoopers.get_children():
 		if player.playing:
 			if player.name in history:
@@ -180,18 +196,21 @@ func stop_sound(name):
 					player.playing = false
 					player.set_stream(null)
 					history.erase(player.name)
+					paused_sounds.erase(player)
 				elif history[player.name] == name:
 					player.stream_paused = true
 					player.stop()
 					player.playing = false
 					player.set_stream(null)
 					history.erase(player.name)
+					paused_sounds.erase(player)
 				elif player.name == name:
 					player.stream_paused = true
 					player.stop()
 					player.playing = false
 					player.set_stream(null)
 					history.erase(player.name)
+					paused_sounds.erase(player)
 
 func sound_file(name):
 	if util.file_exists(name):
@@ -316,6 +335,26 @@ func stop_all_sounds():
 		looper.stop()
 		looper.playing = false
 	history = {}
+	paused_sounds = {}
+
+func pause_sounds():
+	for sound in $SoundPlayers.get_children():
+		if sound.playing:
+			paused_sounds[sound] = sound.get_playback_position()
+			sound.stop()
+			sound.playing = false
+	for looper in $SoundLoopers.get_children():
+		if looper.playing:
+			paused_sounds[looper] = looper.get_playback_position()
+			looper.stop()
+			looper.playing = false
+
+func resume_sounds():
+	for sound in paused_sounds:
+		var seek = paused_sounds[sound]
+		sound.play()
+		sound.seek(seek)
+	paused_sounds = {}
 
 # plays a sound if not already playing
 # todo: add within last time played
