@@ -24,8 +24,8 @@ export(bool) var check_key_input = true
 export(int) var inner_bubble_margins = 19
 
 export(String) var dialog_bubble_scene = settings.dialog_bubble_tscn
-export(String) var choice_bubble_scene = settings.dialog_bubble_tscn
-export(String) var action_bubble_scene = settings.dialog_bubble_tscn
+export(String) var choice_bubble_scene = settings.choice_bubble_tscn
+export(String) var action_bubble_scene = settings.action_bubble_tscn
 
 var dialog_bubble_tscn
 var choice_bubble_tscn
