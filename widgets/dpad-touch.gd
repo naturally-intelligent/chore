@@ -1,5 +1,7 @@
 extends TouchScreenButton
 
+export var diagonal = true
+
 var outer_boundary = 128
 var inner_boundary = 8
 var touch_idx = -1
@@ -17,12 +19,38 @@ var right = false
 var last_degrees = -1
 var wiggle = 23
 
+# sprite frames
+const eight_directions = {
+	'up-left': 0,
+	'up': 1,
+	'up-right': 2,
+	'right': 3,
+	'none': 4,
+	'left': 5,
+	'down-left': 6,
+	'down': 7,
+	'down-right': 8,
+}
+const four_directions = {
+	'none': 0,
+	'up': 1,
+	'right': 2,
+	'down': 3,
+	'left': 4,
+}
+var frames: Dictionary
+
+func _ready():
+	if diagonal:
+		frames = eight_directions
+	else:
+		frames = four_directions
+
 func _process(_delta):
 	if active:
 		press_events()
-	
+
 func _input(event):
-	
 	if event is InputEventScreenTouch \
 	and event.get_index() == touch_idx \
 	and !event.is_pressed():
@@ -34,10 +62,9 @@ func _input(event):
 
 	if event is InputEventScreenDrag \
 	or (event is InputEventScreenTouch and event.is_pressed()):
-		
 		var valid_touch = false
 		var new_touch = false
-		
+
 		if touch_idx == -1:
 			touch_idx = event.get_index()
 			new_touch = true
@@ -66,69 +93,76 @@ func _input(event):
 			elif distance > inner_boundary and distance <= outer_boundary:
 				active = true
 				direction = dpad_normal
-				update_dpad(direction)						
+				update_dpad(direction)
 			else:
 				active = false
 				release_events()
-				reset_dpad()				
-			#print(active, ' ',touch_idx)
+				reset_dpad()
 			last_position = new_position
 
-
 func reset_dpad():
-	$Sprite.frame = 4
+	$Sprite.frame = frames['none']
 	last_degrees = -1
-	
+
 func update_dpad(vector):
 	var deg360 = math.normal_to_360_degrees(vector)
-	var degrees = math.normal_to_45(vector)
-	#print(degrees, ' ', deg360)
+	var degrees
+	degrees = math.normal_to_45(vector)
+	if not diagonal:
+		#degrees = math.normal_to_90(vector)
+		# right diagonals into right
+		if degrees == 45 or degrees == 315:
+			degrees = 0
+		# left diagonals into left
+		if degrees == 135 or degrees == 225:
+			degrees = 180
+	if degrees >= 360: degrees -= 360
 	if last_degrees == degrees:
 		return
 	if degrees == 0 or (deg360 <= 0+wiggle and deg360 >= 0-wiggle):
-		$Sprite.frame = 3
+		$Sprite.frame = frames['right']
 		right = true
 		release_left()
 		release_up()
 		release_down()
 	elif degrees == 180 or (deg360 <= 180+wiggle and deg360 >= 180-wiggle):
-		$Sprite.frame = 5
+		$Sprite.frame = frames['left']
 		left = true
 		release_down()
 		release_right()
 		release_up()
 	elif degrees == 90 or (deg360 <= 90+wiggle and deg360 >= 90-wiggle):
-		$Sprite.frame = 7
+		$Sprite.frame = frames['down']
 		down = true
 		release_right()
 		release_left()
 		release_up()
 	elif degrees == 45:
-		$Sprite.frame = 8
+		$Sprite.frame = frames['down-right']
 		right = true
 		down = true
 		release_left()
 		release_up()
 	elif degrees == 135:
-		$Sprite.frame = 6
+		$Sprite.frame = frames['down-left']
 		down = true
 		left = true
 		release_right()
 		release_up()
 	elif degrees == 225:
-		$Sprite.frame = 0
+		$Sprite.frame = frames['up-left']
 		left = true
 		up = true
 		release_right()
 		release_down()
 	elif degrees == 270:
-		$Sprite.frame = 1
+		$Sprite.frame = frames['up']
 		up = true
 		release_left()
 		release_right()
 		release_down()
 	elif degrees == 315:
-		$Sprite.frame = 2
+		$Sprite.frame = frames['up-right']
 		up = true
 		right = true
 		release_left()
@@ -140,7 +174,7 @@ func press_events():
 	if left: Input.action_press("ui_left")
 	if right: Input.action_press("ui_right")
 	if down: Input.action_press("ui_down")
-		
+
 func release_left():
 	if left:
 		Input.action_release("ui_left")
@@ -155,12 +189,12 @@ func release_up():
 	if up:
 		Input.action_release("ui_up")
 		up = false
-		
+
 func release_down():
 	if down:
 		Input.action_release("ui_down")
 		down = false
-	
+
 func release_events():
 	release_left()
 	release_right()
