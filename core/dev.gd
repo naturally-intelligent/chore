@@ -5,6 +5,7 @@ extends Node
 # DEV HACKS to advance state, etc.
 # - meant to be unused for release, for example a mobile app detected
 # - to advance debug on mobile, need to hack again!
+var dev_file = "res://dev.tmp"
 
 # dev settings
 # IMPORTANT: never change them here, change in launch_hacks() or other function
@@ -16,7 +17,6 @@ var fast_speed = 0.33
 var forced_window = false
 var allow_mouse_cursor = true # turn off for recording videos
 var hide_system_cursor = true
-var screenshot_size = Vector2(640,360) # set to false for native (360x180)
 var autoscreenshot_timer = false
 var autoscreenshot_resolution = Vector2(640,360)
 var autoscreenshot_hidecursor = true
@@ -28,7 +28,7 @@ var debug_overlay = false
 var debug_player = false
 var spawn_point = false
 var spawn_add = Vector2.ZERO
-var player_effect_test = false 
+var player_effect_test = false
 var shader_test = false
 var never_fade_cutscene = false
 var emulate_touch = false
@@ -60,17 +60,17 @@ func launch_hacks():
 	#emulate_touch_mouse = true
 	#shader_test = 'whirl'
 	pass
-	
+
 func game_hacks():
 	pass
 
 func post_launch_hacks():
 	pass
-	
+
 func _init():
 	var file_check = File.new()
-	# IMPORTANT: 'dev.tmp' needs to be created by you, 
+	# IMPORTANT: 'dev.tmp' needs to be created by you,
 	#  and should never be added to release builds
-	if file_check.file_exists("res://dev.tmp"):
+	if file_check.file_exists(dev_file):
 		print("DEV MODE ENABLED")
 		dev_mode_enabled = true
