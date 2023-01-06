@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "ColorRect",
+"class": "CameraTrigger",
+"language": "GDScript",
+"path": "res://widgets/camera-trigger.gd"
+}, {
 "base": "Control",
 "class": "DialogBubble",
 "language": "GDScript",
@@ -50,6 +55,7 @@ _global_script_classes=[ {
 "path": "res://engine/menu.gd"
 } ]
 _global_script_class_icons={
+"CameraTrigger": "",
 "DialogBubble": "",
 "DialogWidget": "",
 "FeatureCamera2D": "",

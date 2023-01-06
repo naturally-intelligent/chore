@@ -1,7 +1,7 @@
 extends Node
 
 # CHORE ENGINE v1.1
-# Designed and developed by David Glen Kerr
+# Designed and developed by David Kerr
 
 # root scene manager
 #  loads and swaps scenes with transitions

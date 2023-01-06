@@ -1,5 +1,5 @@
 ---
-CHORE ENGINE v1.0
+CHORE ENGINE v1.1
 -
 Godot Framework
 ---

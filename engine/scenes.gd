@@ -56,9 +56,6 @@ func thaw(scene_name, transitions={}, info={}, scene_data=false):
 		scene = retrieve_scene(scene_name)
 	else:
 		scene = create_scene(scene_name)
-		scene.name = scene_name
-	if scene.has_method('on_scene_open'):
-		scene.on_scene_open()
 	var infos = {}
 	if info:
 		infos[info] = true

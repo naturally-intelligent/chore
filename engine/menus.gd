@@ -43,8 +43,6 @@ func thaw(menu_name, transitions={}, info={}, menu_data=false):
 		menu = retrieve_menu(menu_name)
 	else:
 		menu = create_menu(menu_name)
-	if menu.has_method('on_menu_open'):
-		menu.on_menu_open()
 	root.switch_to_menu(menu, menu_name, menu_data, info, transitions)
 	return menu
 

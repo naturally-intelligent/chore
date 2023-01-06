@@ -47,7 +47,7 @@ margin_bottom = 367.0
 custom_colors/font_color = Color( 0.729412, 0.537255, 0.447059, 1 )
 custom_constants/line_spacing = 4
 text = "\"Doing chores so you don't have to - since 2022\" 
-quote from Chore Engine after it becomes sentient, circa 2044"
+quote from Chore Engine after it becomes sentient"
 align = 1
 
 [node name="BackButton" type="Button" parent="."]

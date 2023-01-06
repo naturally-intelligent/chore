@@ -4,7 +4,7 @@ class_name RootBaseMenuScene
 # contains the optional methods called by Chore management
 # - meant primarily for reference, inheritance of class is optional
 # - these functions are arranged in order of being called by root
-# - normally you may only need one or two of these depending on your scene
+# - normally you may only need one or two of these depending checked your scene
 
 # data passed to menus/scenes.show(), called before displaying
 func pass_data(data):
@@ -36,16 +36,6 @@ func on_resume():
 #  this overrides the default behavior of menus.back() / scenes.back()
 
 func back():
-	pass
-
-# MENUS - special case for menus
-
-func on_menu_open():
-	pass
-
-# SCENES - special case for scenes
-
-func on_scene_open():
 	pass
 
 # HUD - special case for HUD widgets -> if added to root.add_hud()
