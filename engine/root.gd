@@ -33,6 +33,9 @@ var debug_max := 5
 var hud_allowed := true
 var has_quit := false
 var view_scale = Vector2(1,1)
+var last_input_mouse := false
+var last_input_gamepad := false
+var last_input_keyboard := false
 
 # scenes don't stack, they are a pool of persistent nodes
 #  only 1 is ever running
@@ -73,6 +76,9 @@ func _ready():
 	# Transitions Setup
 	hide_transitions()
 	scale_transitions()
+	# touch emulation
+	if dev.emulate_touch:
+		util.touch = true
 	# Setup Mouse Cursor
 	if settings.hide_system_cursor:
 		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
@@ -261,6 +267,11 @@ func _add_next_scene(scene, scene_name, info):
 	#debug.print('_add_next_scene:','switch_origin=',switch_origin,',switch_target=',switch_target,',origin_style=',origin_style,',target_style=',target_style)
 	if switch_target == 'scene':
 		hide_menus()
+	# load from file?
+	if typeof(scene) == TYPE_STRING:
+		var tscn = load(scene)
+		scene = tscn.instance()
+		scene.name = scene_name
 	# new current scene
 	_next_scene = scene
 	_next_scene.name = scene_name
@@ -480,6 +491,10 @@ func check_is_root_scene(scene, scene_name, scene_type='scene'):
 		root_scene = true
 		scene.queue_free()
 		dev.launch_hacks()
+		if dev.forced_window:
+			print('forcing window size')
+			OS.set_window_fullscreen(false)
+			OS.set_window_size(dev.forced_window)
 		if scene_type == 'scene':
 			scenes.fresh(scene_name)
 		else:
@@ -492,6 +507,11 @@ func _notification(note):
 	if note == NOTIFICATION_PREDELETE:
 		current_scene = null
 		_next_scene = null
+	# mobile back button
+	if note == MainLoop.NOTIFICATION_WM_GO_BACK_REQUEST:
+		menus.back()
+	#if note == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+	#	menus.back()
 
 func enable_menus():
 	menus_root.visible = true
@@ -529,10 +549,7 @@ func scale_transitions():
 		Transitions.rect_scale.y = game.pixel_height / 320
 
 func scale_cursor():
-	# if you use this, reimport mouse cursor texture with no filter
-	if game.pixel_width > settings.scale_mouse_cursor_w:
-		Cursor.rect_scale.x = game.pixel_width / settings.scale_mouse_cursor_w
-		Cursor.rect_scale.y = game.pixel_height / settings.scale_mouse_cursor_h
+	Cursor.rect_scale = settings.scale_mouse_cursor
 
 # https://godotengine.org/qa/25504/pixel-perfect-scaling
 func pixel_perfect_resize():
@@ -560,66 +577,81 @@ func _input(event):
 	# mouse cursor / back button
 	if event is InputEventMouseMotion:
 		mouse = true
+		last_input_mouse = true
+		last_input_gamepad = false
+		last_input_keyboard = false
 		update_mouse_position()
 		update_mouse()
+		return
+	elif event is InputEventKey:
+		last_input_mouse = false
+		last_input_gamepad = false
+		last_input_keyboard = true
+	elif event is InputEventJoypadButton \
+	or event is InputEventJoypadMotion:
+		last_input_mouse = false
+		last_input_gamepad = true
+		last_input_keyboard = false
+		last_input_mouse = false
+		last_input_gamepad = true
+		last_input_keyboard = false
 	# common keys
-	else:
-		if settings.root_capture_ui_cancel and Input.is_action_just_pressed("ui_cancel"):
-			menus.back()
-		if Input.is_action_just_pressed("ui_fullscreen"):
-			util.fullscreen_flip()
-		if Input.is_action_just_pressed("ui_screenshot"):
-			if game.has_method("screenshot"):
-				game.screenshot()
-			else:
-				util.screenshot(self, settings.screenshot_size)
-		if dev.dev_mode_enabled:
-			if Input.is_action_just_pressed("ui_hud"):
-				hud_allowed = not hud_allowed
-				update_hud()
-			if !has_text_entry():
-				if Input.is_key_pressed(KEY_Q):
-					quit()
-				if Input.is_action_just_pressed("ui_autoscreenshot"):
-					flip_autoscreenshot()
-			if Input.is_action_just_pressed("ui_quit"):
+	if settings.root_capture_ui_cancel and Input.is_action_just_pressed("ui_cancel"):
+		menus.back()
+	if Input.is_action_just_pressed("ui_fullscreen"):
+		util.fullscreen_flip()
+	if Input.is_action_just_pressed("ui_screenshot"):
+		if game.has_method("screenshot"):
+			game.screenshot()
+		else:
+			util.screenshot(self, settings.screenshot_size)
+	if dev.dev_mode_enabled:
+		if Input.is_action_just_pressed("ui_hud"):
+			hud_allowed = not hud_allowed
+			update_hud()
+		if !has_text_entry():
+			if Input.is_key_pressed(KEY_Q):
 				quit()
-			if Input.is_action_just_pressed("dev_pause"):
-				debug.console('pause - press Backspace to resume')
-				pause()
-				Engine.time_scale = 0.0
-			elif Input.is_action_just_pressed("dev_advance"):
-				debug.console('advance - \\ for next frame or Backspace to resume')
-				Engine.time_scale = 1.0
-				resume()
-				reset()
-				$Timers/Advance.start()
-			elif Input.is_action_just_pressed("dev_resume"):
-				hide_console()
-				resume()
-				reset()
-			elif Input.is_action_pressed("dev_slow"):
-				resume()
-				Engine.time_scale *= 0.75
-				if Engine.time_scale < 0.1:
-					Engine.time_scale = 0.1
-				debug.console('slow ',util.trim_decimals(Engine.time_scale, 1),'  - press Backspace for normal')
-			elif Input.is_action_pressed("dev_fast"):
-				resume()
-				Engine.time_scale *= 1.5
-				if Engine.time_scale > 10:
-					Engine.time_scale = 10
-				debug.console('fast ',util.trim_decimals(Engine.time_scale, 1),' - press Backspace for normal')
-			elif Input.is_action_just_pressed("dev_console"):
-				flip_console()
-				if is_console_visible():
-					show_console_readme()
-			elif Input.is_action_just_pressed("dev_info_prev"):
-				debug_info_prev()
-			elif Input.is_action_just_pressed("dev_info_next"):
-				debug_info_next()
-			elif Input.is_action_just_pressed("dev_info_point"):
-				debug_info_point()
+			if Input.is_action_just_pressed("ui_autoscreenshot"):
+				flip_autoscreenshot()
+		if Input.is_action_just_pressed("ui_quit"):
+			quit()
+		if Input.is_action_just_pressed("dev_pause"):
+			debug.console('pause - press Backspace to resume')
+			pause()
+			Engine.time_scale = 0.0
+		elif Input.is_action_just_pressed("dev_advance"):
+			debug.console('advance - \\ for next frame or Backspace to resume')
+			Engine.time_scale = 1.0
+			resume()
+			reset()
+			$Timers/Advance.start()
+		elif Input.is_action_just_pressed("dev_resume"):
+			hide_console()
+			resume()
+			reset()
+		elif Input.is_action_pressed("dev_slow"):
+			resume()
+			Engine.time_scale *= 0.75
+			if Engine.time_scale < 0.1:
+				Engine.time_scale = 0.1
+			debug.console('slow ',util.trim_decimals(Engine.time_scale, 1),'  - press Backspace for normal')
+		elif Input.is_action_pressed("dev_fast"):
+			resume()
+			Engine.time_scale *= 1.5
+			if Engine.time_scale > 10:
+				Engine.time_scale = 10
+			debug.console('fast ',util.trim_decimals(Engine.time_scale, 1),' - press Backspace for normal')
+		elif Input.is_action_just_pressed("dev_console"):
+			flip_console()
+			if is_console_visible():
+				show_console_readme()
+		elif Input.is_action_just_pressed("dev_info_prev"):
+			debug_info_prev()
+		elif Input.is_action_just_pressed("dev_info_next"):
+			debug_info_next()
+		elif Input.is_action_just_pressed("dev_info_point"):
+			debug_info_point()
 
 # UPDATES
 
@@ -640,6 +672,8 @@ func reset_overlay():
 func update_mouse():
 	var show_mouse = false
 	if util.desktop and settings.allow_mouse_cursor:
+		show_mouse = true
+	if last_input_mouse:
 		show_mouse = true
 	if current_scene:
 		if current_scene.get('no_mouse'):
@@ -1218,6 +1252,24 @@ func setup_small_viewport(big_resolution=Vector2(1920,1080), small_resolution=Ve
 	if game.has_method("high_resolution_mode"):
 		game.call_deferred("high_resolution_mode")
 
+# TOUCH
+
+func touch_display():
+	if settings.disable_touch_ui:
+		return false
+	if settings.touch_controls == 'auto':
+		if dev.emulate_touch: return true
+		return util.mobile and OS.has_touchscreen_ui_hint()
+	elif settings.touch_controls == 'on':
+		if dev.emulate_touch: return true
+		if not OS.has_touchscreen_ui_hint():
+			dev.emulate_touch = true
+			dev.emulate_touch_mouse = true
+			show_cursor()
+		return true
+	else: # off
+		return false
+
 # MISC
 
 func has_text_entry():
@@ -1330,5 +1382,6 @@ func quit():
 		has_quit = true
 		debug.print('quit')
 		#print_stray_nodes()
+		#debug.print_instance(1917)
 		#debug.print(print_tree_pretty())
 		get_tree().quit()

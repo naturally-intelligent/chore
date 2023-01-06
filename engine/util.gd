@@ -11,10 +11,7 @@ var windows := false
 var linux := false
 var osx := false
 var web := false
-# input
-var mouse := false
-var keyboard := false
-var joystick := false
+# touch
 var touch := false
 
 func _ready():
@@ -45,9 +42,9 @@ func platform_detection():
 		desktop = false
 
 func input_detection():
+	touch = false
 	if OS.has_touchscreen_ui_hint():
 		touch = true
-	touch = false
 
 # SORT CLASSES
 class FirstElementGreatest:
@@ -613,6 +610,16 @@ static func delete_children(node):
 		node.remove_child(n)
 		n.queue_free()
 
+static func get_all_children(node) -> Array:
+	var nodes: Array = []
+	for c in node.get_children():
+		if c.get_child_count() > 0:
+			nodes.append(c)
+			nodes.append_array(get_all_children(c))
+		else:
+			nodes.append(c)
+	return nodes
+
 static func opposite_direction(direction: String) -> String:
 	if direction == 'up':
 		return 'down'
@@ -626,16 +633,18 @@ static func opposite_direction(direction: String) -> String:
 
 # TILES
 
-static func tilemap_closest_used_cell(map: TileMap, position: Vector2):
+static func tilemap_closest_used_cell(map: TileMap, position: Vector2, direction):
 	var desired_cell = map.world_to_map(position)
 	if map.get_cell(desired_cell.x, desired_cell.y) == TileMap.INVALID_CELL:
 		var closest_cell = false
 		var closest_distance = 100000
 		for cell in map.get_used_cells():
-			var distance = desired_cell.distance_to(cell)
-			if distance < closest_distance:
-				closest_cell = cell
-				closest_distance = distance
+			var world_direction = position.direction_to(map.map_to_world(cell))
+			if not direction or sign(world_direction.x) == sign(direction.x):
+				var distance = desired_cell.distance_to(cell)
+				if distance < closest_distance:
+					closest_cell = cell
+					closest_distance = distance
 		return closest_cell
 	return desired_cell
 
@@ -668,6 +677,9 @@ static func string_to_bool(s: String) -> bool:
 		return true
 	else:
 		return false
+
+static func vector_to_string(vector) -> String:
+	return "x="+str(trim_decimals(vector.x, 1))+" y="+str(trim_decimals(vector.y, 1))
 
 static func keycode_to_scancode(key_code):
 	var scan_code = OS.find_scancode_from_string(key_code) # ex: Escape
