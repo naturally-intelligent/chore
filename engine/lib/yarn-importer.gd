@@ -2,14 +2,14 @@ extends Node
 #
 # A YARN Importer for Godot
 #
-# Credits: 
+# Credits:
 # - Dave Kerr (http://www.naturallyintelligent.com)
-# 
+#
 # Latest: https://github.com/naturally-intelligent/godot-yarn-importer
-# 
+#
 # Yarn: https://github.com/InfiniteAmmoInc/Yarn
 # Twine: http://twinery.org
-# 
+#
 # Yarn: a ball of threads (Yarn file)
 # Thread: a series of fibres (Yarn node)
 # Fibre: a text or choice or logic (Yarn line)
@@ -21,7 +21,7 @@ var yarn = {}
 # called to request new dialog
 func say(text):
 	pass
-	
+
 # called to request new choice button
 func choice(text, marker):
 	pass
@@ -29,15 +29,15 @@ func choice(text, marker):
 # called to request internal logic handling
 func logic(instruction, command):
 	pass
-	
+
 # called for each line of text
 func yarn_text_variables(text):
 	return text
-	
+
 # called when "settings" node parsed
 func story_setting(setting, value):
 	pass
-	
+
 # called for each node name
 func yarn_custom_logic(to):
 	pass
@@ -64,7 +64,7 @@ func spin_yarn(file, start_thread = false):
 			var value = split[1].strip_edges(true, true)
 			story_setting(setting, value)
 	# First thread unravel...
-	yarn_unravel(start_thread)
+	return yarn_unravel(start_thread)
 
 # Internally create a new thread (during loading)
 func new_yarn_thread():
@@ -73,6 +73,7 @@ func new_yarn_thread():
 	thread['kind'] = 'branch' # 'branch' for standard dialog, 'code' for gdscript
 	thread['tags'] = [] # unused
 	thread['fibres'] = []
+	thread['header'] = {} # all the command before dialog, like title: intro
 	return thread
 
 # Internally create a new fibre (during loading)
@@ -128,20 +129,22 @@ func load_yarn(path):
 				if line == '---':
 					header = false
 				else:
-					var split = line.split(': ')
-					if split[0] == 'title':
-						var title_split = split[1].split(':')
-						var thread_title = ''
-						var thread_kind = 'branch'
-						if len(title_split) == 1:
-							thread_title = split[1]
-						else:
-							thread_title = title_split[1]
-							thread_kind = title_split[0]
-						thread['title'] = thread_title
-						thread['kind'] = thread_kind
-						if not yarn['start']:
-							yarn['start'] = thread_title
+					var split = line.split(': ', true, 2)
+					if split.size() == 2:
+						thread['header'][split[0]] = split[1]
+						if split[0] == 'title':
+							var title_split = split[1].split(':')
+							var thread_title = ''
+							var thread_kind = 'branch'
+							if len(title_split) == 1:
+								thread_title = split[1]
+							else:
+								thread_title = title_split[1]
+								thread_kind = title_split[0]
+							thread['title'] = thread_title
+							thread['kind'] = thread_kind
+							if not yarn['start']:
+								yarn['start'] = thread_title
 			# end of thread
 			elif line == '===':
 				header = true
@@ -159,9 +162,10 @@ func load_yarn(path):
 # Main logic for node handling
 #
 func yarn_unravel(to, from=false):
+	var thread
 	yarn_custom_logic(to)
 	if to in yarn['threads']:
-		var thread = yarn['threads'][to]
+		thread = yarn['threads'][to]
 		match thread['kind']:
 			'branch':
 				for fibre in thread['fibres']:
@@ -181,6 +185,7 @@ func yarn_unravel(to, from=false):
 	else:
 		print('WARNING: Missing Yarn thread: ', to, ' in file ',yarn['file'])
 	yarn_custom_logic_after(to)
+	return thread
 
 #
 # RUN GDSCRIPT CODE FROM YARN NODE - Special node = code:title
