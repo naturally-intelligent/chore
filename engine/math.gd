@@ -61,6 +61,11 @@ static func normal_to_45(n):
 	var deg = normal_to_360_degrees(n)
 	return stepify(deg, 45)
 
+static func normal_to_90(n):
+	var deg = normal_to_360_degrees(n)
+	if deg >= 360: deg -= 360
+	return stepify(deg, 90)
+
 ### POSITIONS
 
 static func nearest_position(parent, position):
