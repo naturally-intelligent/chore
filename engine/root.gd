@@ -1,7 +1,7 @@
 extends Node
 
 # CHORE ENGINE v1.1
-# Designed and developed by David Kerr
+# Designed and developed by David Glen Kerr
 
 # root scene manager
 #  loads and swaps scenes with transitions
@@ -9,6 +9,7 @@ extends Node
 
 # scene info
 var last_scene_name := ''
+var last_scene_type := 'none'
 var switching_scene := false
 var root_scene := false
 var first_scene := true
@@ -60,6 +61,7 @@ var big_screen_node = null
 signal scene_switch_complete()
 signal transition_finished()
 signal switch_transition_finished()
+signal pre_scene_deleted(current_scene_name)
 signal scene_deleted(current_scene_name)
 
 func _ready():
@@ -205,6 +207,7 @@ func _soft_switch(scene, scene_name, scene_data, info, transitions):
 		if current_scene.has_method("notify_closing"):
 			current_scene.notify_closing()
 		last_scene_name = current_scene_name
+		last_scene_type = current_scene_type
 	# PAUSE SCENE
 	_pause_current_scene()
 	# TRANSITION OUT
@@ -305,6 +308,10 @@ func _pre_delete_scenes(info):
 		removal_method = 'delete'
 	if 'clear' in info:
 		removal_method = 'delete_all'
+	if settings.single_scene_mode and switch_target == 'scene' and switch_origin == 'scene':
+		removal_method = 'delete'
+	if settings.single_menu_mode and switch_target == 'menu' and switch_origin == 'menu':
+		removal_method = 'delete'
 	# removal
 	if removal_method == 'delete':
 		if current_scene:
@@ -312,7 +319,7 @@ func _pre_delete_scenes(info):
 			origin_root.remove_child(current_scene)
 			current_scene = null
 			if switch_target == 'scene':
-				emit_signal("scene_deleted", current_scene_name)
+				emit_signal("pre_scene_deleted", current_scene_name)
 	# removal?
 	elif removal_method == 'delete_all':
 		var removal = []
@@ -322,7 +329,7 @@ func _pre_delete_scenes(info):
 		for child in removal:
 			target_root.remove_child(child)
 		if switch_target == 'scene':
-			emit_signal("scene_deleted", current_scene_name)
+			emit_signal("pre_scene_deleted", current_scene_name)
 
 # removing may not mean deleting, could be hiding
 func _remove_current_scene(info):
@@ -658,7 +665,7 @@ func _input(event):
 func update_ui():
 	if settings.hide_system_cursor:
 		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	if mouse:
+	if last_input_mouse:
 		update_mouse()
 	update_debug()
 	update_hud()
@@ -1171,6 +1178,8 @@ func show_hud():
 
 func hide_hud():
 	OverlayHUD.visible = false
+	if current_scene and current_scene.has_method("on_focus"):
+		current_scene.on_focus()
 
 func is_hud_visible():
 	return OverlayHUD.visible

@@ -2,10 +2,10 @@ extends Node
 
 var title = 'Chore Engine'
 var subtitle = ''
-var version = '1.1'
+var version = '1.0'
 var state = ''
 var release = false
-var year = '2022-2023'
+var year = '2022'
 
 var demo = true
 var website = "https://www.naturallyintelligent.com"
@@ -66,25 +66,25 @@ func _init():
 func _ready():
 	on_new_game()
 	data_structure()
-
+	
 func data_structure():
 	pass
 
 func sort_scoreboard():
 	scoreboard_sorted = {}
-
+	
 func on_new_game():
 	reset_scores()
-
+	
 func on_new_level():
 	reset_scores()
-
+	
 func reset_scores():
 	scores['player1'] = 0
 
 func massage_label(label):
 	label.text = label.text.replace('YEAR', year)
-	label.text = label.text.replace('VER', 'v'+version)
+	label.text = label.text.replace('VER', 'v'+version)	
 
 func word(origin):
 	if origin in game.strings:

@@ -42,7 +42,7 @@ func thaw(menu_name, transitions={}, info={}, menu_data=false):
 	if has_in_memory(menu_name):
 		menu = retrieve_menu(menu_name)
 	else:
-		menu = create_menu(menu_name)
+		menu = find_menu_file(menu_name)
 	root.switch_to_menu(menu, menu_name, menu_data, info, transitions)
 	return menu
 

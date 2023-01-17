@@ -55,7 +55,7 @@ func thaw(scene_name, transitions={}, info={}, scene_data=false):
 	if has_in_memory(scene_name) and not force_refresh:
 		scene = retrieve_scene(scene_name)
 	else:
-		scene = create_scene(scene_name)
+		scene = find_scene_file(scene_name)
 	var infos = {}
 	if info:
 		infos[info] = true

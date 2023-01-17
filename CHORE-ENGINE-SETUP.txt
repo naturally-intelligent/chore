@@ -1,7 +1,7 @@
 ---
-CHORE ENGINE
+CHORE ENGINE v1.0
 -
-Godot 3 Framework
+Godot Framework
 ---
 
 What does this engine do?
