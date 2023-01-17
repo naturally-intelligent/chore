@@ -1,4 +1,5 @@
 extends TextureButton
+class_name CalmButton
 
 # CALM TEXTURE BUTTON
 #
