@@ -58,6 +58,7 @@ var talk_script = false
 var bubble_grow_time = 0.25
 var next_action_timer = 0
 var next_action_delay = bubble_grow_time + 1.5 # delay until user can do something
+var dialog_closed = false
 
 func widget():
 	return self
@@ -74,6 +75,8 @@ func _ready():
 		dialog_id = name
 
 func _process(delta):
+	if dialog_closed:
+		return
 	if next_action_timer > 0:
 		next_action_timer = next_action_timer - delta
 	if auto_remove:
@@ -308,6 +311,8 @@ func reset():
 	delete_dialogs()
 
 func dialog_press():
+	if dialog_closed:
+		return
 	if any_animating():
 		return false
 	if next_action_timer > 0:
@@ -318,6 +323,8 @@ func dialog_press():
 	return true
 
 func bubble_press(bubble):
+	if dialog_closed:
+		return
 	if bubble.animating:
 		return
 	if next_action_timer > 0:
@@ -330,6 +337,8 @@ func bubble_press(bubble):
 		dialog_press()
 
 func _unhandled_key_input(event):
+	if dialog_closed:
+		return
 	if check_key_input:
 		if Input.is_action_pressed("ui_accept"):
 			dialog_press()
