@@ -43,6 +43,9 @@ func thaw(menu_name, transitions={}, info={}, menu_data=false):
 		menu = retrieve_menu(menu_name)
 	else:
 		menu = find_menu_file(menu_name)
+	if not menu:
+		debug.print("ERROR: menu.thaw() can't find menu: ", menu_name)
+		return false
 	root.switch_to_menu(menu, menu_name, menu_data, info, transitions)
 	return menu
 

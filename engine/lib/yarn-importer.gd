@@ -78,8 +78,9 @@ func new_yarn_thread():
 
 # Internally create a new fibre (during loading)
 func new_yarn_fibre(line):
+	var first_two = line.substr(0,2)
 	# choice fibre
-	if line.substr(0,2) == '[[':
+	if first_two == '[[':
 		if line.find('|') != -1:
 			var fibre = {}
 			fibre['kind'] = 'choice'
@@ -90,7 +91,7 @@ func new_yarn_fibre(line):
 			fibre['marker'] = split[1]
 			return fibre
 	# logic instruction (not part of official Yarn standard)
-	elif line.substr(0,2) == '<<':
+	elif first_two == '<<':
 		if line.find(':') != -1:
 			var fibre = {}
 			fibre['kind'] = 'logic'
@@ -101,6 +102,12 @@ func new_yarn_fibre(line):
 			fibre['command'] = split[1]
 			#print(line, split[0], split[1])
 			return fibre
+	 # comment ##
+	elif first_two == '##':
+		var fibre = {}
+		fibre['kind'] = 'comment'
+		fibre['text'] = line.strip_edges(true, true)
+		return fibre
 	# text fibre
 	var fibre = {}
 	fibre['kind'] = 'text'
@@ -109,10 +116,10 @@ func new_yarn_fibre(line):
 
 # Create Yarn data structure from file (must be *.yarn.txt Yarn format)
 func load_yarn(path):
-	var yarn = {}
-	yarn['threads'] = {}
-	yarn['start'] = false
-	yarn['file'] = path
+	var new_yarn = {}
+	new_yarn['threads'] = {}
+	new_yarn['start'] = false
+	new_yarn['file'] = path
 	var file = File.new()
 	file.open(path, file.READ)
 	if file.is_open():
@@ -143,12 +150,12 @@ func load_yarn(path):
 								thread_kind = title_split[0]
 							thread['title'] = thread_title
 							thread['kind'] = thread_kind
-							if not yarn['start']:
-								yarn['start'] = thread_title
+							if not new_yarn['start']:
+								new_yarn['start'] = thread_title
 			# end of thread
 			elif line == '===':
 				header = true
-				yarn['threads'][thread['title']] = thread
+				new_yarn['threads'][thread['title']] = thread
 				thread = new_yarn_thread()
 			# fibre read mode
 			else:
@@ -157,7 +164,7 @@ func load_yarn(path):
 					thread['fibres'].append(fibre)
 	else:
 		print('ERROR: Yarn file missing: ', filename)
-	return yarn
+	return new_yarn
 
 # Main logic for node handling
 #
@@ -166,6 +173,7 @@ func yarn_unravel(to, from=false):
 	yarn_custom_logic(to)
 	if to in yarn['threads']:
 		thread = yarn['threads'][to]
+		yarn_header(thread['header'])
 		match thread['kind']:
 			'branch':
 				for fibre in thread['fibres']:
@@ -240,6 +248,9 @@ func run_yarn_code(code):
 	remove_child(node)
 
 	return result
+
+func yarn_header(header):
+	pass
 
 # EXPORTING TO GDSCRIPT
 #

@@ -94,19 +94,19 @@ func array(a, title=false):
 static func convert_string(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14):
 	var s = str(s1)
 	var c = ' '
-	if s2 or s2 is bool: s+=c+str(s2); else: return s
-	if s3 or s3 is bool: s+=c+str(s3); else: return s
-	if s4 or s4 is bool: s+=c+str(s4); else: return s
-	if s5 or s5 is bool: s+=c+str(s5); else: return s
-	if s6 or s6 is bool: s+=c+str(s6); else: return s
-	if s7 or s7 is bool: s+=c+str(s7); else: return s
-	if s8 or s8 is bool: s+=c+str(s8); else: return s
-	if s9 or s9 is bool: s+=c+str(s9); else: return s
-	if s10 or s10 is bool: s+=c+str(s10); else: return s
-	if s11 or s11 is bool: s+=c+str(s11); else: return s
-	if s12 or s12 is bool: s+=c+str(s12); else: return s
-	if s13 or s13 is bool: s+=c+str(s13); else: return s
-	if s14 or s14 is bool: s+=c+str(s14); else: return s
+	if s2 != null: s+=c+str(s2); else: return s
+	if s3 != null: s+=c+str(s3); else: return s
+	if s4 != null: s+=c+str(s4); else: return s
+	if s5 != null: s+=c+str(s5); else: return s
+	if s6 != null: s+=c+str(s6); else: return s
+	if s7 != null: s+=c+str(s7); else: return s
+	if s8 != null: s+=c+str(s8); else: return s
+	if s9 != null: s+=c+str(s9); else: return s
+	if s10 != null: s+=c+str(s10); else: return s
+	if s11 != null: s+=c+str(s11); else: return s
+	if s12 != null: s+=c+str(s12); else: return s
+	if s13 != null: s+=c+str(s13); else: return s
+	if s14 != null: s+=c+str(s14); else: return s
 	return s
 
 # same as print(), but forced to print
@@ -154,3 +154,6 @@ func print_object(object):
 	var property_list = object.get_property_list()
 	for prop in property_list:
 		debug.print (prop.name, object.get(prop.name))
+
+func var_dump(variable):
+	debug.print(to_json(variable))

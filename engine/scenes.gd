@@ -59,6 +59,9 @@ func thaw(scene_name, transitions={}, info={}, scene_data=false):
 	var infos = {}
 	if info:
 		infos[info] = true
+	if not scene:
+		debug.print("ERROR: scene.thaw() can't find scene: ", scene_name)
+		return false
 	root.switch_to_scene(scene, scene_name, scene_data, infos, transitions)
 	return scene
 
@@ -72,6 +75,9 @@ func hard(scene_name, scene_data=false):
 	transitions['middle'] = 'none'
 	transitions['in'] = 'none'
 	return thaw(scene_name, transitions, {}, scene_data)
+
+func reload_current_scene():
+	fresh(root.current_scene_name)
 
 # restore top scene
 func reveal():

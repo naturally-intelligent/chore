@@ -102,6 +102,9 @@ func _ready():
 
 # called by menus.show()
 func switch_to_menu(menu, menu_name, menu_data=false, info={}, transitions={}):
+	if not menu:
+		debug.print("ERROR: root.switch_to_menu called without menu, aborting")
+		return false
 	if 'switch_target' in info:
 		info['switch_target'] = info['switch_target']
 	else:
@@ -115,6 +118,9 @@ func switch_to_menu(menu, menu_name, menu_data=false, info={}, transitions={}):
 
 # called by scenes.show()
 func switch_to_scene(scene, scene_name, scene_data=false, info={}, transitions={}):
+	if not scene:
+		debug.print("ERROR: root.switch_to_scene called without scene, aborting")
+		return false
 	if 'switch_target' in info:
 		info['switch_target'] = info['switch_target']
 	else:
@@ -581,6 +587,10 @@ func pixel_perfect_resize():
 # INPUT
 
 func _input(event):
+	# help
+	if Input.is_action_just_pressed("ui_help"):
+		if game.has_method("help"):
+			game.help()
 	# mouse cursor / back button
 	if event is InputEventMouseMotion:
 		mouse = true
@@ -612,6 +622,7 @@ func _input(event):
 			game.screenshot()
 		else:
 			util.screenshot(self, settings.screenshot_size)
+	# dev keys
 	if dev.dev_mode_enabled:
 		if Input.is_action_just_pressed("ui_hud"):
 			hud_allowed = not hud_allowed
@@ -707,7 +718,10 @@ func is_cursor_visible():
 
 func show_cursor():
 	if settings.custom_mouse_cursor:
-		Mouse.visible = true
+		if settings.allow_mouse_cursor:
+			Mouse.visible = true
+		if dev.hide_mouse_cursor:
+			Mouse.visible = false
 
 func hide_cursor():
 	Mouse.visible = false
@@ -1214,7 +1228,7 @@ func remove_hud():
 func setup_small_viewport(big_resolution=Vector2(1920,1080), small_resolution=Vector2(640,360)):
 	var viewport: Viewport = get_viewport()
 	# create viewport scene to hold smaller game view
-	var gvc_tscn = load("res://widgets/game-viewport.tscn")
+	var gvc_tscn = load(settings.root_viewport_tscn)
 	var game_viewport_container = gvc_tscn.instance()
 	# move to top of root node
 	add_child(game_viewport_container)

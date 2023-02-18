@@ -5,7 +5,7 @@ var info_index := -1
 
 func _ready() -> void:
 	set_process(false)
-	
+
 func _process(delta):
 	update_info_nodes()
 
@@ -38,7 +38,7 @@ func remove_info_node(node: Node):
 					node.disable_debug_overlay()
 	if info_refs.empty():
 		set_process(false)
-	
+
 func update_info_nodes():
 	for info_ref in info_refs:
 		if info_ref:

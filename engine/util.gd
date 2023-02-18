@@ -497,6 +497,10 @@ static func screenshot(scene, scale=false, logo=false):
 	if show_cursor:
 		root.hide_cursor()
 
+	# transparent background
+	if settings.screenshot_transparent_bg:
+		scene.get_viewport().transparent_bg = true
+
 	# Let two frames pass to make sure the screen was captured
 	yield(scene.get_tree(), "idle_frame")
 	yield(scene.get_tree(), "idle_frame")
@@ -504,12 +508,19 @@ static func screenshot(scene, scale=false, logo=false):
 	# Retrieve the captured image
 	var img: Image = scene.get_viewport().get_texture().get_data()
 
-	# scale after (note, doesn't upscale pixel-art nicely)
-	if scale:
+	# undo transparent background
+	if settings.screenshot_transparent_bg:
+		scene.get_viewport().transparent_bg = false
+
+	# scale after
+	if scale and scale != Vector2(1,1):
 		img.resize(scale.x, scale.y, Image.INTERPOLATE_NEAREST)
 
 	# Flip it on the y-axis (because it's flipped)
 	img.flip_y()
+	# color range format for alpha (useful for capturing assets)
+	if settings.screenshot_transparent_bg:
+		img.convert(Image.FORMAT_RGBA8)
 
 	# optional logo (filename like "res://art/logo.png")
 	if logo:
@@ -596,6 +607,12 @@ static func dir_sep():
 		return '\\'
 	else:
 		return '/'
+
+static func append_separator(dir):
+	var last = dir.substr(-1, 1)
+	if last != '/' and last != '\\':
+		return dir + dir_sep()
+	return dir
 
 static func strip_bbcode(text):
 	var regex = RegEx.new()

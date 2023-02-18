@@ -28,7 +28,7 @@ var pause_tree_during_switch = false
 var custom_mouse_cursor = "res://art/hud/cursor-1.png"
 var allow_mouse_cursor = true
 var hide_system_cursor = true
-var scale_mouse_cursor = true
+var scale_mouse_cursor = Vector2(1,1)
 var scale_mouse_cursor_w = 640
 var scale_mouse_cursor_h = 360
 
@@ -66,7 +66,13 @@ var screenshot_scale = false # Vector2
 var stretch_mode = false # SceneTree.STRETCH_MODE_VIEWPORT
 var stretch_aspect = false # SceneTree.STRETCH_ASPECT_KEEP
 var small_root_viewport := false
+var root_viewport_tscn := "res://widgets/game-viewport.tscn"
 var expanded_resolution = false # Vector2
+
+# DIALOG
+var dialog_bubble_tscn := "res://widgets/dialog-bubble.tscn"
+var choice_bubble_scene := "res://widgets/dialog-bubble.tscn"
+var action_bubble_scene := "res://widgets/dialog-bubble.tscn"
 
 # CONFIG FILE
 var settings_config = {}
